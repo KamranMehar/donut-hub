@@ -190,6 +190,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.16"
+  fl_country_code_picker:
+    dependency: "direct main"
+    description:
+      name: fl_country_code_picker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -208,7 +215,7 @@ packages:
       name: flutter_native_splash
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.15"
+    version: "2.2.16"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -415,6 +422,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  scrollable_positioned_list:
+    dependency: transitive
+    description:
+      name: scrollable_positioned_list
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.5"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -545,7 +559,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.1"
+    version: "3.1.2"
   xdg_directories:
     dependency: transitive
     description:
