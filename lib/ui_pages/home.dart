@@ -1,6 +1,7 @@
 
-import 'package:donut_hub/pages/login_page.dart';
-import 'package:donut_hub/pages/profile.dart';
+import 'package:donut_hub/admin%20pages/add_item.dart';
+import 'package:donut_hub/authentication%20pages/login_page.dart';
+import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:donut_hub/util/roundI_icon_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -117,6 +118,12 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
+           floatingActionButton: FloatingActionButton(
+             heroTag: 'addItem',
+             onPressed: (){
+             Navigator.push(context, MaterialPageRoute(builder: (context)=>AddItem()));
+           },
+           child: Icon(Icons.add,color: Colors.white,),),
            ///Drawer
            drawer:  Drawer(width: 250,
              backgroundColor: Colors.pink.withOpacity(0.5),
@@ -174,8 +181,8 @@ class _HomeState extends State<Home> {
   }
   @override
   void initState() {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black26,));
+ /*   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black26,));*/
     ///Lock orientations on Mobile Devices
     if(defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android){
       SystemChrome.setPreferredOrientations([
@@ -195,11 +202,13 @@ class MyDrawer extends StatefulWidget {
 
 }
 class _MyDrawerState extends State<MyDrawer> {
+  var user= FirebaseAuth.instance.currentUser;
 
-  String emailUser = FirebaseAuth.instance.currentUser?.email.toString() ?? "";
 
   @override
   Widget build(BuildContext context) {
+    String emailUser = user!.email.toString();
+    String phoneNumber = user!.phoneNumber.toString();
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -216,7 +225,7 @@ class _MyDrawerState extends State<MyDrawer> {
             accountName: HeadingText(
                 text: "Josuke Jotaro", color: Colors.white, isUnderline: false),
             accountEmail: NormalText(
-              text: emailUser, color: Colors.grey.shade400, size: 18,)),
+              text: emailUser ?? phoneNumber, color: Colors.grey.shade400, size: 18,)),
         ListTile(leading: Lottie.asset('lib/icons/heart.json',),
           title: const Text('Favourites',
             style: TextStyle(fontSize: 18, color: Colors.white),),),

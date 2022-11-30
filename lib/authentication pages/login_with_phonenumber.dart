@@ -1,4 +1,4 @@
-import 'package:donut_hub/pages/verify_code_page.dart';
+import 'package:donut_hub/authentication%20pages/verify_code_page.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:donut_hub/util/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';

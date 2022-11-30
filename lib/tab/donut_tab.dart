@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../pages/item_detail.dart';
+import '../ui_pages/item_detail.dart';
 import '../util/Util.dart';
 import '../util/donut_tile.dart';
 

@@ -1,8 +1,8 @@
-import 'package:donut_hub/pages/home.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../ui_pages/home.dart';
 import '../util/custom_button.dart';
 
 class VerifyCode extends StatefulWidget {

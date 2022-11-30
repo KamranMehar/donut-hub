@@ -1,6 +1,5 @@
-import 'package:donut_hub/pages/home.dart';
-import 'package:donut_hub/pages/login_page.dart';
-import 'package:donut_hub/pages/signup_page.dart';
+import 'package:donut_hub/authentication%20pages/login_page.dart';
+import 'package:donut_hub/ui_pages/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

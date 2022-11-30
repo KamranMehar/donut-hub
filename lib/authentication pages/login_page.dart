@@ -1,12 +1,12 @@
 
-import 'package:donut_hub/pages/login_with_phonenumber.dart';
-import 'package:donut_hub/pages/signup_page.dart';
+import 'package:donut_hub/authentication%20pages/login_with_phonenumber.dart';
+import 'package:donut_hub/authentication%20pages/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../ui_pages/home.dart';
 import '../util/Util.dart';
 import '../util/custom_button.dart';
-import 'home.dart';
 
 ///Login page
 class LoginPage extends StatefulWidget {
@@ -130,6 +130,34 @@ class _LoginPageState extends State<LoginPage> {
                   },)
                 ),
                 const SizedBox(height: 5,),
+                ///Login with phone
+                InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                          LoginWithPhone()
+                      ));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Hero(
+                        tag: 'phone',
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              border: Border.all(color: Colors.pink,width: 1),
+                              borderRadius: BorderRadius.circular(15)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children:  [
+                              Text("Login with phone number ",style: TextStyle(fontSize: 15,color:Colors.white,fontWeight: FontWeight.bold),),
+                              Icon(Icons.phone,color: Colors.white,)
+                            ],),
+                        ),
+                      ),)),
+                const SizedBox(height: 8,),
+                ///Not a member
                 InkWell(
                   onTap: (){
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => Sign_up()));
@@ -143,35 +171,9 @@ class _LoginPageState extends State<LoginPage> {
                       ],),
                   ),
                 ),
-                const SizedBox(height: 8,),
-                InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                    LoginWithPhone()
-                    ));
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Hero(
-                      tag: 'phone',
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                          border: Border.all(color: Colors.pink,width: 1),
-                          borderRadius: BorderRadius.circular(15)
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children:  [
-                          Text("Login with Phone number ",style: TextStyle(fontSize: 15,color:Colors.white,fontWeight: FontWeight.bold),),
-                          Icon(Icons.phone,color: Colors.white,)
-                        ],),
-                ),
-                    ),))
               ],
             ),
-
+          
           ],)
       ),
     );
