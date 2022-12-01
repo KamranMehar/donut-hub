@@ -121,7 +121,7 @@ class _HomeState extends State<Home> {
            floatingActionButton: FloatingActionButton(
              heroTag: 'addItem',
              onPressed: (){
-             Navigator.push(context, MaterialPageRoute(builder: (context)=>AddItem()));
+             Navigator.push(context, MaterialPageRoute(builder: (context)=>const AddItem()));
            },
            child: Icon(Icons.add,color: Colors.white,),),
            ///Drawer
