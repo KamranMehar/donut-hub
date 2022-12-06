@@ -4,19 +4,19 @@ import 'dart:io';
 import 'package:donut_hub/classes/item_class.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:donut_hub/util/add_ingred_buttom.dart';
+import 'package:donut_hub/util/custom_button.dart';
 import 'package:donut_hub/util/ingredients_eclipse_shap.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:firebase_storage/firebase_storage.dart' as  firebase_storage;
 
 
 String itemTypeSelected="Select Item type";
 const List<String> itemList = <String>['Donut', 'Burger', 'Smoothie', 'PanCakes','Pizza'];
-//onst List<String> ingredList = ['Sugar', 'Salt', 'Fat', 'Energy',];
-//String ingredientsTypeSelected="Select Ingredients type ";
 
 
 Item item= Item();
@@ -31,21 +31,21 @@ class _AddItemState extends State<AddItem> {
 
   final _formKey = GlobalKey<FormState>();
   bool allDone=false;
-  String coverImagePath="";
-  String titleImagePath="";
+  File? coverImage;
+  File? titleImage;
+  final picker=ImagePicker();
   String weight="";
   bool loading=false;
-  final databaseRef=FirebaseDatabase.instance.ref();
   final titleController=TextEditingController();
   final priceTextController=TextEditingController();
   final detailController=TextEditingController();
   final weightTextController=TextEditingController();
-
   //ingredients flags
   bool isSugar=false;
   bool isSalt=false;
   bool isFat=false;
   bool isEnergy=false;
+
   @override
   Widget build(BuildContext context) {
     return Hero(tag: 'addItem',
@@ -85,14 +85,15 @@ class _AddItemState extends State<AddItem> {
                         borderRadius: const BorderRadius.only(bottomRight: Radius.circular(30),bottomLeft: Radius.circular(30) ),
                         border: Border.all(color: Colors.pink,width: 1)
                       ),
-                      child: Image.file(File(coverImagePath.toString()),
-                         // width: double.infinity,
-                         // height: 300,
-                          fit: BoxFit.fill,
-                          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace){
-                            return const SafeArea(child:  Center(child:
-                            Text("Chose Cover Image",style: TextStyle(fontSize: 18,color: Colors.white),)));
-                          }),
+                      child: ClipRRect(
+                        borderRadius:const  BorderRadius.only(bottomLeft: Radius.circular(30),bottomRight: Radius.circular(30),),
+                        child:coverImage!=null? Image.file(coverImage!.absolute,
+                           // width: double.infinity,
+                           // height: 300,
+                            fit: BoxFit.fill,
+                        ):SafeArea(child:  Center(child:
+                        Text("Chose Cover Image",style: TextStyle(fontSize: 18,color: Colors.white),))),
+                      ),
                     ),
                   ),
                   ///Title Image Upload Image button
@@ -114,14 +115,11 @@ class _AddItemState extends State<AddItem> {
                           ),
                           child:ClipRRect(
                             borderRadius: BorderRadius.circular(15),
-                            child: Image.file(File(titleImagePath),
-                              fit: BoxFit.fitWidth,
-                              errorBuilder: (BuildContext context,Object exception,StackTrace? stackTrace){
-                                return const Center(
-                                  child: Text(
-                                    "add Image",style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold),),
-                                );
-                              },),
+                            child:titleImage!=null? Image.file(titleImage!.absolute,
+                              fit: BoxFit.fitWidth,):const Center(
+                              child: Text(
+                                "add Image",style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold),),
+                            ),
                           )
                       ),
                     ),
@@ -361,62 +359,121 @@ class _AddItemState extends State<AddItem> {
                         )
                     ],
                   ),
-                )
+                ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: CustomButton(text: "Upload",
+                        isLoading:loading, click: ()async{
+                      if(_formKey.currentState!.validate()) {
+                        item.name = titleController.text;
+                        item.price = priceTextController.text;
+                        item.details = detailController.text;
+                        if ((titleImage==null) && (coverImage==null)) {
+                          Util_.showToast("Select Images");
+                        } else if (item.itemType == "") {
+                          Util_.showToast("Select Item Type");
+                        } else if ((item.sugarPercentage == "") &&
+                            (item.sugarGram == "")
+                            && (item.saltPercentage == "") &&
+                            (item.saltGram == "")
+                            && (item.fatPercentage == "") && (item.fateGram == "")
+                            && (item.energyPercentage == "") &&
+                            (item.energyGrams == "")) {
+                          Util_.showToast("Add All ingredients");
+                        } else {
+                          setState(() {
+                            loading=true;
+                          });
+                          ///Firebase Logic
+                          DatabaseReference dataBaseRef=FirebaseDatabase.instance
+                              .ref("Items/${item.itemType}/${item.name}");
+
+                          firebase_storage.Reference reference=firebase_storage.FirebaseStorage.instance.
+                          ref("${item.itemType}/${item.name}/${item.name}_titleImage_${ DateTime.now().millisecond}");
+                          firebase_storage.UploadTask uploadTask=reference.putFile(titleImage!.absolute);
+                          await Future.value(uploadTask).then((value) async{
+
+                            var titleImageUrl=await reference.getDownloadURL();
+                            item.titleImage=titleImageUrl;
+
+                            firebase_storage.Reference ref=firebase_storage.FirebaseStorage.instance.
+                            ref("${item.itemType}/${item.name}/${item.name}_coverImage_${ DateTime.now().millisecond}");
+                            firebase_storage.UploadTask upload_task=ref.putFile(coverImage!.absolute);
+                            await Future.value(upload_task).then((value) async {
+                              var coverImageUrl=await ref.getDownloadURL();
+                              item.coverImage=coverImageUrl;
+
+                              dataBaseRef.set({
+                                'name':item.name,
+                                'price':item.price,
+                                'titleImage':item.titleImage,
+                                'coverImage':item.coverImage,
+                                'itemType':item.itemType,
+                                'details':item.details,
+                                'sugarGram':item.sugarGram,
+                                'sugarPercentage':item.sugarPercentage,
+                                'saltGram':item.saltGram,
+                                'saltPercentage':item.saltPercentage,
+                                'fatGram':item.fateGram,
+                                'fatPercentage':item.fatPercentage,
+                                'energyGram':item.energyGrams,
+                                'energyPercentage':item.energyPercentage
+                              }).then((value) {
+                                Util_.showToast("${item.name} Added Successfully");
+                                setState(() {
+                                  loading=false;
+                                });
+                              }).onError((error, stackTrace){
+                                setState(() {
+                                  loading=false;
+                                });
+                                Util_.showErrorDialog(context, error.toString());
+                              });
+
+                            }).onError((error, stackTrace) {
+                              setState(() {
+                                loading=false;
+                              });
+                              Util_.showErrorDialog(context, error.toString());
+                            });
+
+                          }).onError((error, stackTrace){
+                            setState(() {
+                              loading=false;
+                            });
+                            Util_.showErrorDialog(context, error.toString());
+                          });
+
+                        }
+                      }
+
+                    }),
+                  )
                 ],),
               ],),
             ),
-            floatingActionButton:
-            Visibility(
-              visible: allDone,
-              child: InkWell(
-                onTap: (){
-                  if(_formKey.currentState!.validate()){
-                    item.name=titleController.text;
-                    item.price=priceTextController.text;
-                    item.details=detailController.text;
-                  }
-                  ///Upload to firebase Logic will be here
-                  Util_.showToast("All Done");
-                },
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.pink,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.pink.shade800,
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset:const Offset(4, 4)
-                      ),
-                    ],
-                  ),
-                child: const Icon(Icons.done_outlined,color: Colors.white,),),
-              ),)
-            ,),
+          ),
         ));
   }
-   pickImage(bool isCover) async{
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-      //  allowedExtensions: ['jpg', 'png',],
-      );
-      if(result!=null){
-       // setState((){allDone=true;});
-        if(isCover==true){
-         coverImagePath= result.files.single.path!;
-         item.coverImage=coverImagePath;
-         setState(() {});
-        }else{
-          titleImagePath= result.files.single.path!;
-          item.titleImage= titleImagePath;
-          setState((){});
-        }
-      }
+
+
+
+  pickImage(bool isCover) async{
+     final pickerFile=await picker.pickImage(source: ImageSource.gallery);
+     setState(() {
+       if(pickerFile!=null){
+         // setState((){allDone=true;});
+         if(isCover==true){
+           coverImage=File(pickerFile.path);
+         }else{
+         titleImage=File(pickerFile.path);
+         }
+       }else{
+         Util_.showToast("No Image selected");
+       }
+     });
   }
-int getPercentage(String grams,String weight){
+  int getPercentage(String grams,String weight){
     int percentage=((int.parse(grams)/int.parse(weight))*100).round();
     print("Percentage:: "+percentage.toString());
     return percentage;
@@ -581,8 +638,8 @@ class _MyDropDownState extends State<MyDropDown> {
                         setState(() {
                           isOpen=false;
                         //  itemTypeSelected=e;
-                          item.name=e;
-                          itemTypeSelected=item.name;
+                          item.itemType=e;
+                          itemTypeSelected=item.itemType;
                         });
                       },
                       child: Container(
@@ -601,79 +658,3 @@ class _MyDropDownState extends State<MyDropDown> {
     );
   }
 }
-
-/*
-class IngrDropDown extends StatefulWidget {
-  const IngrDropDown({Key? key}) : super(key: key);
-
-  @override
-  State<IngrDropDown> createState() => _IngrDropDownState();
-}
-
-class _IngrDropDownState extends State<IngrDropDown> {
-  bool isOpen=false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: (){
-            setState(() {
-              FocusManager.instance.primaryFocus?.unfocus();
-              isOpen=!isOpen;
-            });
-          },
-          child: AnimatedContainer(
-padding: const EdgeInsets.symmetric(horizontal: 15),
-            duration:const Duration(milliseconds: 600),
-            width: 200,
-            decoration: BoxDecoration(
-              color: isOpen?Colors.pink:Colors.grey.shade500,
-              border: Border.all(color: Colors.pink,width: 1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text(ingredientsTypeSelected,style: const TextStyle(fontSize: 10,color: Colors.white,fontWeight: FontWeight.bold),),
-                const Icon(Icons.keyboard_arrow_down_outlined,color: Colors.white,)
-              ],
-            ),
-          ),
-        ),
-        if(isOpen)
-          SingleChildScrollView(
-            child: SizedBox(
-              width: 100,
-              child: ListView(
-                primary: false,
-                shrinkWrap: true,
-                children: ingredList.map((e) =>
-                    Padding(padding:const EdgeInsets.all(5),
-                      child:  InkWell(
-                        onTap: (){
-                          setState(() {
-                            isOpen=false;
-                            ingredientsTypeSelected=e;
-                          });
-                        },
-                        child: Container(
-                          padding:const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade500,
-                            border: Border.all(color: Colors.pink,width: 1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(e,style:const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 10),),
-                        ),
-                      ),)).toList(),
-              ),
-            ),
-          )
-      ],
-    );
-  }
-}
-*/
-

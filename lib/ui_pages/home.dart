@@ -5,6 +5,7 @@ import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:donut_hub/util/roundI_icon_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +22,8 @@ import '../util/contants.dart';
 import '../util/my_tab.dart';
 import '../util/round_profile_icon.dart';
 import 'cart.dart';
-
+String userName="";
+String userEmail="";
 class Home extends StatefulWidget {
   static String id="home_screen";
   const Home({Key? key}) : super(key: key);
@@ -121,7 +123,7 @@ class _HomeState extends State<Home> {
            floatingActionButton: FloatingActionButton(
              heroTag: 'addItem',
              onPressed: (){
-             Navigator.push(context, MaterialPageRoute(builder: (context)=>const AddItem()));
+             Navigator.push(context, MaterialPageRoute(builder: (context)=> AddItem()));
            },
            child: Icon(Icons.add,color: Colors.white,),),
            ///Drawer
@@ -202,13 +204,10 @@ class MyDrawer extends StatefulWidget {
 
 }
 class _MyDrawerState extends State<MyDrawer> {
-  var user= FirebaseAuth.instance.currentUser;
-
 
   @override
   Widget build(BuildContext context) {
-    String emailUser = user!.email.toString();
-    String phoneNumber = user!.phoneNumber.toString();
+    getUserData();
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -223,9 +222,9 @@ class _MyDrawerState extends State<MyDrawer> {
                   'https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc='),),
             ),
             accountName: HeadingText(
-                text: "Josuke Jotaro", color: Colors.white, isUnderline: false),
+                text: userName??"", color: Colors.white, isUnderline: false),
             accountEmail: NormalText(
-              text: emailUser ?? phoneNumber, color: Colors.grey.shade400, size: 18,)),
+              text: userEmail??"", color: Colors.grey.shade400, size: 18,)),
         ListTile(leading: Lottie.asset('lib/icons/heart.json',),
           title: const Text('Favourites',
             style: TextStyle(fontSize: 18, color: Colors.white),),),
@@ -251,5 +250,20 @@ class _MyDrawerState extends State<MyDrawer> {
         )
       ],
     );
+  }
+  getUserData() async{
+    var userId=FirebaseAuth.instance.currentUser!.uid;
+    var ref=FirebaseDatabase.instance.ref(userId);
+    final snapshot = await ref.get();
+    if (snapshot.exists) {
+      Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
+      setState(() {
+        userEmail=mapList['email'];
+        userName=mapList['name'];
+      });
+      print(mapList);
+    } else {
+      print('No data available.');
+    }
   }
 }

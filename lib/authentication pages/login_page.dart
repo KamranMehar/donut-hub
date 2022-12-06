@@ -134,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                 InkWell(
                     onTap: (){
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                          LoginWithPhone()
+                         const LoginWithPhone()
                       ));
                     },
                     child: Padding(
@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children:  [
+                            children: const [
                               Text("Login with phone number ",style: TextStyle(fontSize: 15,color:Colors.white,fontWeight: FontWeight.bold),),
                               Icon(Icons.phone,color: Colors.white,)
                             ],),

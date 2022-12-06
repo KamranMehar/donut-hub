@@ -1,6 +1,6 @@
 
-
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../ui_pages/home.dart';
@@ -19,10 +19,10 @@ class Sign_up extends StatefulWidget {
 class _Sign_upState extends State<Sign_up> {
   final _formKey = GlobalKey<FormState>();
   bool loading=false;
-
+  final databaseRef=FirebaseDatabase.instance.ref();
   TextEditingController emailController=TextEditingController();
   TextEditingController passwordController=TextEditingController();
- // TextEditingController nameTextController=TextEditingController();
+  TextEditingController nameTextController=TextEditingController();
   bool visiblePas=false;
   @override
   Widget build(BuildContext context) {
@@ -55,28 +55,34 @@ class _Sign_upState extends State<Sign_up> {
                 child: Text("Hope you will love this service!",style: TextStyle(fontSize: 18,color: Colors.white70),),
               ),
               const SizedBox(height: 5,),
-              ///Name
-             /* Container(
-                padding:const EdgeInsets.symmetric(horizontal: 5),
-                margin: const EdgeInsets.all( 12),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.grey[100],
-                    border: Border.all(color: Colors.white,width: 1)
-                ),
-                child:   TextField(
-                  controller: nameTextController,
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Name',
-                      hintStyle: TextStyle(color: Colors.grey)
-                  ),
-                ),
-              ),*/
+
            Form(
              key: _formKey,
                child: Column(children: [
+                 ///Name
+               Container(
+                   padding:const EdgeInsets.symmetric(horizontal: 5),
+                   margin: const EdgeInsets.all( 12),
+                   decoration: BoxDecoration(
+                       borderRadius: BorderRadius.circular(15),
+                       color: Colors.grey[100],
+                       border: Border.all(color: Colors.white,width: 1)
+                   ),
+                   child:   TextFormField(
+                     controller: nameTextController,
+                     keyboardType: TextInputType.text,
+                     decoration: const InputDecoration(
+                         border: InputBorder.none,
+                         hintText: 'Name',
+                         hintStyle: TextStyle(color: Colors.grey)
+                     ),
+                     validator: (value){
+                       if(value!.isEmpty){
+                         return "name is Empty!";
+                       }
+                     },
+                   ),
+                 ),
              ///Email
              Container(
                padding:const EdgeInsets.symmetric(horizontal: 5),
@@ -91,6 +97,7 @@ class _Sign_upState extends State<Sign_up> {
                    if(value!.isEmpty){
                      return "Email is Empty";
                    }
+                   return null;
                  },
                  controller: emailController,
                  keyboardType: TextInputType.emailAddress,
@@ -136,7 +143,8 @@ class _Sign_upState extends State<Sign_up> {
                  ),
                ),
              ),
-           ],)),
+           ],)
+           ),
               ///LoginBtn
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -147,7 +155,7 @@ class _Sign_upState extends State<Sign_up> {
                     setState(() {
                       loading=true;
                     });
-                    signupUser(emailController.text, passwordController.text, context);
+                    signupUser(emailController.text, passwordController.text, context,nameTextController.text);
                   }
                 },),
               ),
@@ -170,7 +178,7 @@ class _Sign_upState extends State<Sign_up> {
           SafeArea(
             child: IconButton(onPressed: (){
               Navigator.pop(context);
-            }, icon: Icon(Icons.arrow_back_ios_new,color: Colors.white,size: 30,)),
+            }, icon:const Icon(Icons.arrow_back_ios_new,color: Colors.white,size: 30,)),
           ),
         ],),
       ),
@@ -182,9 +190,10 @@ class _Sign_upState extends State<Sign_up> {
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
+    nameTextController.dispose();
   }
   ///Signup User and catch localized error msg
-  void signupUser(String email, String password,BuildContext context) async {
+  void signupUser(String email, String password,BuildContext context,String name) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     FirebaseAuth auth=FirebaseAuth.instance;
     try {
@@ -195,7 +204,12 @@ class _Sign_upState extends State<Sign_up> {
       setState(() {
       loading=false;
       }),
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>Home())),
+        databaseRef.child(auth.currentUser!.uid.toString()).set({
+          "name": name,
+          "email": email
+        }).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context)=>Home())))
+            .onError((error, stackTrace) => Util_.showErrorDialog(context, error.toString()))
+        ,
       } );
     } on FirebaseAuthException catch (e) {
       setState(() {
