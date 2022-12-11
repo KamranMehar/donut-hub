@@ -19,7 +19,7 @@ class Sign_up extends StatefulWidget {
 class _Sign_upState extends State<Sign_up> {
   final _formKey = GlobalKey<FormState>();
   bool loading=false;
-  final databaseRef=FirebaseDatabase.instance.ref();
+  final databaseRef=FirebaseDatabase.instance.ref("Users");
   TextEditingController emailController=TextEditingController();
   TextEditingController passwordController=TextEditingController();
   TextEditingController nameTextController=TextEditingController();

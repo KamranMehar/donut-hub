@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../util/contants.dart';
+import '../util/constents.dart';
 import '../util/ingredients_eclipse_shap.dart';
 
 class ItemDetail extends StatefulWidget {

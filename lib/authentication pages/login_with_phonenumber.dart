@@ -17,6 +17,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone> {
   bool loading=false;
   final _formKey = GlobalKey<FormState>();
   final phoneController=TextEditingController();
+  final nameController=TextEditingController();
   final countryPicker = const FlCountryCodePicker();
   CountryCode? countryCode;
   @override
@@ -40,74 +41,73 @@ class _LoginWithPhoneState extends State<LoginWithPhone> {
             body: Column(children: [
               ///Upper text
              const Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: const Text("A Verification Code Will be send to your number",
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text("A Verification Code Will be send to your number",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18,color: Colors.white60),),
               ),
              const Spacer(flex: 1,),
-              ///TextFormField
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: ()async{
-                      final code = await countryPicker.showPicker(context: context);
-                      setState(() {
-                        countryCode=code;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
-                          border: Border.all(color: Colors.pink,width: 1),
-                          borderRadius: BorderRadius.circular(15)
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            child: countryCode!=null? countryCode!.flagImage: Icon(Icons.flag,color: Colors.white,),
-                          ),
+           Form(
+               key: _formKey,
+               child: Row(
+                 mainAxisAlignment: MainAxisAlignment.center,
+                 children: [
+                   ///Country Code picker
+                   InkWell(
+                     onTap: ()async{
+                       final code = await countryPicker.showPicker(context: context);
+                       setState(() {
+                         countryCode=code;
+                       });
+                     },
+                     child: Container(
+                       padding: const EdgeInsets.all(15),
+                       decoration: BoxDecoration(
+                           color: Colors.white.withOpacity(0.3),
+                           border: Border.all(color: Colors.pink,width: 1),
+                           borderRadius: BorderRadius.circular(15)
+                       ),
+                       child: Row(
+                         children: [
+                           Container(
+                             child: countryCode!=null? countryCode!.flagImage: const Icon(Icons.flag,color: Colors.white,),
+                           ),
                            Text(countryCode!=null?countryCode!.dialCode.toString():"",style: const TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10,),
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        border: Border.all(color: Colors.pink,width: 1),
-                        borderRadius: BorderRadius.circular(15)
-                    ),
-                    width: MediaQuery.of(context).size.width*3/5,
-                    child: Form(
-                      key: _formKey,
-                      child: TextFormField(
-                        style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.bold),
-                        minLines: 1,
-                        validator: (value){
+                         ],
+                       ),
+                     ),
+                   ),
+                   const SizedBox(width: 10,),
+                   Container(
+                     padding: const EdgeInsets.all(5),
+                     decoration: BoxDecoration(
+                         color: Colors.white.withOpacity(0.3),
+                         border: Border.all(color: Colors.pink,width: 1),
+                         borderRadius: BorderRadius.circular(15)
+                     ),
+                     width: MediaQuery.of(context).size.width*3/5,
+                     child: TextFormField(
+                       style: const TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.bold),
+                       minLines: 1,
+                       validator: (value){
                          if(value!.isEmpty){
                            return 'Phone Number Is Empty';
                          }else if(value.length<10){
                            return "Number Should be 10 digit!";
                          }
-                        },
-                        controller: phoneController,
-                        keyboardType: TextInputType.number,
-                        decoration:  InputDecoration(
+                       },
+                       controller: phoneController,
+                       keyboardType: TextInputType.number,
+                       decoration:  InputDecoration(
 
-                          hintText: 'Enter Phone number',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(color: Colors.grey[400])
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                           hintText: 'Enter Phone number',
+                           border: InputBorder.none,
+                           hintStyle: TextStyle(color: Colors.grey[400])
+                       ),
+                     ),
+                   ),
+                 ],
+               )),
               const Spacer(flex: 1,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal:10),
@@ -126,7 +126,6 @@ class _LoginWithPhoneState extends State<LoginWithPhone> {
                         }else{
                         String number=countryCode!.dialCode;
                         number=number+phoneController.text.toString();
-                        print("PHONE NUMBER ????????????????? "+number);
                         auth.verifyPhoneNumber(
                           phoneNumber: number,
                             verificationCompleted: (context){

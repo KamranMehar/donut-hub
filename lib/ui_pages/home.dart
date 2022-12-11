@@ -18,12 +18,14 @@ import '../tab/donut_tab.dart';
 import '../tab/pancake_tab.dart';
 import '../tab/pizza_tab.dart';
 import '../tab/smoothie_tab.dart';
-import '../util/contants.dart';
+import '../util/constents.dart';
 import '../util/my_tab.dart';
 import '../util/round_profile_icon.dart';
 import 'cart.dart';
-String userName="";
-String userEmail="";
+String? userName;
+String? userEmail;
+String? phoneNumber;
+String? userImage;
 class Home extends StatefulWidget {
   static String id="home_screen";
   const Home({Key? key}) : super(key: key);
@@ -98,7 +100,7 @@ class _HomeState extends State<Home> {
                         width: 60,
                         iconPath: 'lib/icons/avatar_women.json',
                         onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const ProfilePage()));
                     }),
                   )
                 ),
@@ -211,20 +213,24 @@ class _MyDrawerState extends State<MyDrawer> {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
+        if(userImage!=null)
         UserAccountsDrawerHeader(
             decoration: const BoxDecoration(color: Colors.pink),
             // currentAccountPictureSiconst ze: Size(80, 80),
-            currentAccountPicture: const Padding(
-              padding: EdgeInsets.only(bottom: 5),
+            currentAccountPicture:  Padding(
+              padding: const EdgeInsets.only(bottom: 5),
               child: CircleAvatar(
                 backgroundColor: Colors.white, backgroundImage:
-              NetworkImage(
-                  'https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc='),),
+              NetworkImage(userImage!,),),
             ),
             accountName: HeadingText(
-                text: userName??"", color: Colors.white, isUnderline: false),
-            accountEmail: NormalText(
-              text: userEmail??"", color: Colors.grey.shade400, size: 18,)),
+                text: userName??"Not Found", color: Colors.white, isUnderline: false),
+            accountEmail: NormalText(text: userEmail??phoneNumber??"Not Found", color: Colors.grey.shade400)
+        ),
+        ///User Detail not Found
+        Visibility(
+          visible: userName!=null?false:true,
+            child: HeadingText(text: "Complete Your Personal Details", color: Colors.white, isUnderline: false)),
         ListTile(leading: Lottie.asset('lib/icons/heart.json',),
           title: const Text('Favourites',
             style: TextStyle(fontSize: 18, color: Colors.white),),),
@@ -253,17 +259,25 @@ class _MyDrawerState extends State<MyDrawer> {
   }
   getUserData() async{
     var userId=FirebaseAuth.instance.currentUser!.uid;
-    var ref=FirebaseDatabase.instance.ref(userId);
+    var ref=FirebaseDatabase.instance.ref("Users/$userId");
     final snapshot = await ref.get();
     if (snapshot.exists) {
       Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
       setState(() {
+        if(mapList['userImage']!=null){
+          userImage=mapList['userImage'];
+        }
+        if(mapList['email']!=null){
         userEmail=mapList['email'];
+        }
+        if(mapList['name']!=null){
         userName=mapList['name'];
+        }
+        if(mapList['phoneNumber']!=null){
+        phoneNumber=mapList['phoneNumber'];
+        }
       });
-      print(mapList);
-    } else {
-      print('No data available.');
+
     }
   }
 }

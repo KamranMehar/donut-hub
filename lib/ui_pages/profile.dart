@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:ui' as ui;
-
-import '../util/contants.dart';
+import '../util/constents.dart';
+import 'edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   static String id="profile_page";
@@ -13,13 +15,22 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String? userName;
+  String? userEmail;
+  String? userPhoneNumber;
+  String? userImage;
+
   @override
   Widget build(BuildContext context) {
     final Size size=MediaQuery.of(context).size;
 
-    return Hero(
-      tag: 'profile',
-      child: Scaffold(
+    return Stack(children: [
+      Hero(tag: 'profile',
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+        ),),
+      Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
           fit: StackFit.expand,
@@ -27,15 +38,15 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: size.height,width: size.width,),
             Align(
               alignment: Alignment.topCenter,
-                child: CustomPaint(
-                  size: Size(size.width,(size.width*0.625).toDouble()), //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
-                  painter: RPSCustomPainter(),
-                ),
+              child: CustomPaint(
+                size: Size(size.width,(size.width*0.625).toDouble()), //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
+                painter: RPSCustomPainter(),
+              ),
             ),
-             Align(
-               alignment: Alignment.topCenter,
-               child: SingleChildScrollView(
-                 child: Column(
+            Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  child: Column(
                     children: [
                       ///Back Icon
                       SafeArea(child: Align(
@@ -48,36 +59,54 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Lottie.asset('lib/icons/arrow_left.json',fit: BoxFit.cover))),
                       ),),
                       ///Profile Image
-                   const Padding(padding: EdgeInsets.only(bottom: 5),
-                   child: CircleAvatar(
-                     radius: 53,
-                     backgroundColor: Colors.purple,
-                     child: CircleAvatar(
-                       backgroundColor: Colors.purple,
-                       radius: 50,
-                       backgroundImage: NetworkImage('https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc='),
-                     ),
-                   ),),
-                     HeadingText(text: "Profile Name", color: Colors.black, isUnderline: false,size: 23,),
-                     ///Edit Profile
-                     Container(
-                       height: 40,
-                       width: 90,
-                       decoration:  BoxDecoration(
-                         gradient:  LinearGradient(colors: [
-                           Colors.pink,
-                           Colors.pink.shade200,
-                         ]),
-                         borderRadius: BorderRadius.all(Radius.circular(15))
-                       ),
-                       child: InkWell(
-                           onTap: (){
-                             setState(() {
-                               ///On Edit Profile
-                             });
-                           },
-                           child: Center(child: NormalText(text: 'Edit Profile', color: Colors.white,size: 15,))),
-                     ),
+                      Padding(padding: const EdgeInsets.only(bottom: 5),
+                        child: Hero(
+                          tag: 'dp',
+                          child: CircleAvatar(
+                            radius: 53,
+                            backgroundColor: Colors.purple,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.purple,
+                              radius: 50,
+                              backgroundImage:userImage!=null? NetworkImage(userImage!):const AssetImage('lib/images/user.png') as ImageProvider,
+                            ),
+                          ),
+                        ),),
+                      ///name
+                      Hero(
+                          tag: 'name',
+                          child: HeadingText(text: userName??"", color: Colors.black, isUnderline: false,size: 25,)),
+                      const SizedBox(height: 5,),
+                      ///email
+                      Hero(
+                          tag: 'email',
+                          child: NormalText(text: userEmail??"", color: Colors.grey.shade800,size: 18,)),
+                      const SizedBox(height: 5,),
+                      if(userPhoneNumber!=null)
+                        Hero(
+                          tag: 'phone',
+                          child: NormalText(text: userPhoneNumber!, color: Colors.grey.shade800,size: 18,),
+                        ),
+                      ///Edit Profile btn
+                      InkWell(
+                        onTap: (){
+                          setState(() {
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=>EditProfile()));
+                          });
+                        },
+                        child: Container(
+                          height: 40,
+                          width: 90,
+                          decoration:  BoxDecoration(
+                              gradient:  LinearGradient(colors: [
+                                Colors.pink,
+                                Colors.pink.shade200,
+                              ]),
+                              borderRadius:const BorderRadius.all(Radius.circular(15))
+                          ),
+                          child: Center(child: NormalText(text: 'Edit Profile', color: Colors.white,size: 15,)),
+                        ),
+                      ),
                       ///Recently ordered txt
                       Padding(
                         padding: EdgeInsets.all(5),
@@ -87,15 +116,46 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
 
 
-                 ],),
-               )
-             ),
+                    ],),
+                )
+            ),
 
 
           ],
         ),
       ),
-    );
+
+    ],);
+  }
+
+  getUserData()async{
+    var userId=FirebaseAuth.instance.currentUser!.uid;
+    DatabaseReference ref=FirebaseDatabase.instance.ref("Users/$userId");
+    final snapshot = await ref.get();
+    if (snapshot.exists) {
+      Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
+      setState(() {
+        if(mapList['userImage']!=null){
+          userImage=mapList['userImage'];
+        }
+        if(mapList['email']!=null){
+          userEmail=mapList['email'];
+        }
+        if(mapList['name']!=null){
+          userName=mapList['name'];
+        }
+        if(mapList['phoneNumber']!=null){
+          userPhoneNumber=mapList['phoneNumber'].toString();
+        }
+      });
+
+    }
+  }
+
+  @override
+  void initState() {
+    getUserData();
+    super.initState();
   }
 }
 class RPSCustomPainter extends CustomPainter{

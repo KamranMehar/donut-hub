@@ -1,5 +1,6 @@
 import 'package:donut_hub/util/Util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import '../ui_pages/home.dart';
@@ -8,7 +9,7 @@ import '../util/custom_button.dart';
 class VerifyCode extends StatefulWidget {
   final String verificationId;
   final String phoneNumber;
-   VerifyCode({Key? key,
+   const VerifyCode({Key? key,
   required this.verificationId,
   required this.phoneNumber,
   }) : super(key: key);
@@ -20,7 +21,6 @@ class VerifyCode extends StatefulWidget {
 class _VerifyCodeState extends State<VerifyCode> {
   final auth=FirebaseAuth.instance;
   final codeController=TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
   bool loading=false;
   @override
@@ -109,13 +109,27 @@ class _VerifyCodeState extends State<VerifyCode> {
                     final credential=PhoneAuthProvider.credential(
                         verificationId: widget.verificationId, smsCode: codeController.text);
                     try{
-                    await auth.signInWithCredential(credential).then((value) =>
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>Home())))
-                        .onError((error, stackTrace) => Util_.showToast(error.toString()));
-                    setState(() {
-                      loading=false;
-                    });
+                    await auth.signInWithCredential(credential).then((value) async {
+                      DatabaseReference databaseReference= FirebaseDatabase.instance.ref("Users/${auth.currentUser!.uid}");
+                      databaseReference.set({
+                        'phoneNumber':widget.phoneNumber,
+                      }).then((value) {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
+                      }).onError((error, stackTrace) {
+                        setState(() {
+                          loading=false;
+                        });
+                        Util_.showErrorDialog(context, error.toString());
+                      });
 
+                    }
+                        )
+                        .onError((error, stackTrace) {
+                      Util_.showToast(error.toString());
+                      setState(() {
+                        loading=false;
+                      });
+                    });
 
                     }catch(e){
                       setState(() {

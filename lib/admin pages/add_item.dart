@@ -91,7 +91,7 @@ class _AddItemState extends State<AddItem> {
                            // width: double.infinity,
                            // height: 300,
                             fit: BoxFit.fill,
-                        ):SafeArea(child:  Center(child:
+                        ):const SafeArea(child:  Center(child:
                         Text("Chose Cover Image",style: TextStyle(fontSize: 18,color: Colors.white),))),
                       ),
                     ),
