@@ -109,22 +109,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       ///Recently ordered txt
                       Padding(
-                        padding: EdgeInsets.all(5),
+                        padding:const EdgeInsets.all(5),
                         child: Align(
                             alignment: Alignment.centerLeft,
                             child: NormalText(text: 'Recently Ordered', color: Colors.grey.shade800,size: 15,)),
                       ),
-
-
                     ],),
                 )
             ),
-
-
           ],
         ),
       ),
-
     ],);
   }
 

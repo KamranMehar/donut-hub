@@ -64,7 +64,6 @@ class _HomeState extends State<Home> {
       iconPath: 'lib/icons/pizza.png', label: 'Pizza',
     ),
   ];
-
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
