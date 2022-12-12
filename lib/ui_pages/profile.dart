@@ -1,3 +1,4 @@
+import 'package:donut_hub/ui_pages/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         alignment: Alignment.topLeft,
                         child: InkWell(
                             onTap: (){
-                              Navigator.pop(context,true);
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const Home()));
                             }, child: SizedBox(
                             height: 60,width: 60,
                             child: Lottie.asset('lib/icons/arrow_left.json',fit: BoxFit.cover))),

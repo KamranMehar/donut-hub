@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:io';
+import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:donut_hub/ui_pages/home.dart';
 import 'package:donut_hub/util/custom_button.dart';
@@ -42,30 +43,27 @@ class _EditProfileState extends State<EditProfile> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: InkWell(
-                    onTap: (){
-                      Navigator.pop(context,true);
-                    }, child: SizedBox(
-                    height: 60,width: 60,
-                    child: Lottie.asset('lib/icons/arrow_left.json',fit: BoxFit.cover))),
-              ),
-              SizedBox(
-                width: size.width,
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              ///Image
-              GestureDetector(
-                onTap: () {
-                  pickImage();
-                },
-                child: Padding(
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                      }, child: SizedBox(
+                      height: 60,width: 60,
+                      child: Lottie.asset('lib/icons/arrow_left.json',fit: BoxFit.cover))),
+                ),
+                SizedBox(
+                  width: size.width,
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                ///Image
+                Padding(
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Hero(
                     tag: 'dp',
@@ -83,61 +81,36 @@ class _EditProfileState extends State<EditProfile> {
                                       as ImageProvider,
                           child: Align(
                             alignment: Alignment.bottomRight,
-                            child: Container(
-                              height: 35,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                  borderRadius:  BorderRadius.circular(100),
-                                  color: Colors.black.withOpacity(0.4)),
-                              child: const Center(
-                                  child: Text(
-                                'Change',
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 12),
-                              )),
+                            child: GestureDetector(
+                              onTap: () {
+                                pickImage();
+                              },
+                              child: Container(
+                                height: 35,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                    borderRadius:  BorderRadius.circular(100),
+                                    color: Colors.black.withOpacity(0.4)),
+                                child: const Center(
+                                    child: Text(
+                                  'Change',
+                                  style:
+                                      TextStyle(color: Colors.white, fontSize: 12),
+                                )),
+                              ),
                             ),
                           ),
                         )),
                   ),
                 ),
-              ),
 
-              ///Name
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Hero(
-                  tag: 'name',
-                  child: TextField(
-                    controller: nameController,
-                    style: const TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      fillColor: Colors.grey,
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                        borderSide: const BorderSide(
-                          color: Colors.pink,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                        borderSide: const BorderSide(
-                          color: Colors.black,
-                          width: 2.0,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              ///Phone
-              if (phoneNumber != null)
+                ///Name
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Hero(
-                    tag: 'phone',
+                    tag: 'name',
                     child: TextField(
-                      controller: phoneController,
+                      controller: nameController,
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         fillColor: Colors.grey,
@@ -158,90 +131,94 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                 ),
-              if (email != null)
 
-                ///Email
+                ///Phone
+                if (phoneNumber != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Hero(
+                      tag: 'phone',
+                      child: TextField(
+                        controller: phoneController,
+                        style: const TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                          fillColor: Colors.grey,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                            borderSide: const BorderSide(
+                              color: Colors.pink,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                            borderSide: const BorderSide(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (email != null)
+
+                  ///Email
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Hero(
+                      tag: 'email',
+                      child:
+                      TextField(
+                        controller: emailController,
+                        style: const TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                          fillColor: Colors.grey,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                            borderSide: const BorderSide(
+                              color: Colors.pink,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                            borderSide: const BorderSide(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                ///Save Button
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Hero(
-                    tag: 'email',
-                    child:
-                    TextField(
-                      controller: emailController,
-                      style: const TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                        fillColor: Colors.grey,
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                          borderSide: const BorderSide(
-                            color: Colors.pink,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                          borderSide: const BorderSide(
-                            color: Colors.black,
-                            width: 2.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-              ///Save Button
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: CustomButton(
-                    isLoading: loading,
-                    text: "Save",
-                    click: () async {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      DatabaseReference ref =
-                          FirebaseDatabase.instance.ref("Users/$userId");
-                      setState(() {
-                        if (email != null) {
-                          email = emailController.text;
-                        }
-                        name = nameController.text;
-                        if (phoneNumber != null) {
-                          phoneNumber = phoneController.text;
-                        }
-                        loading = true;
-                      });
-
-                      ///Set Data without image
-                      if (titleImage == null) {
-                        ref.set({
-                          if (email != null) 'email': email,
-                          'name': name,
-                          if (phoneNumber != null) 'phoneNumber': phoneNumber,
-                        }).then((_) {
-                          Util_.showToast("details Updated Successfully");
-                          setState(() {
-                            loading = false;
-                          });
-                        }).onError((error, stackTrace) {
-                          setState(() {
-                            loading = false;
-                          });
-                          Util_.showErrorDialog(context, error.toString());
+                  padding: const EdgeInsets.all(10),
+                  child: CustomButton(
+                      isLoading: loading,
+                      text: "Save",
+                      click: () async {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        DatabaseReference ref =
+                            FirebaseDatabase.instance.ref("Users/$userId");
+                        setState(() {
+                          if (email != null) {
+                            email = emailController.text;
+                          }
+                          name = nameController.text;
+                          if (phoneNumber != null) {
+                            phoneNumber = phoneController.text;
+                          }
+                          loading = true;
                         });
-                      } else {
-                        ///Set Data with image
-                        firebase_storage.Reference storageRef = firebase_storage
-                            .FirebaseStorage.instance
-                            .ref("UsersImages/$userId");
 
-                        firebase_storage.UploadTask imageUploadTask =
-                            storageRef.putFile(titleImage!.absolute);
-                        await Future.value(imageUploadTask).then((value) async {
-                          var imageUrl = await storageRef.getDownloadURL();
+                        ///Set Data without image
+                        if (titleImage == null) {
                           ref.set({
                             if (email != null) 'email': email,
                             'name': name,
                             if (phoneNumber != null) 'phoneNumber': phoneNumber,
-                            'userImage': imageUrl
+                            'userImage': image,
                           }).then((_) {
                             Util_.showToast("details Updated Successfully");
                             setState(() {
@@ -253,16 +230,43 @@ class _EditProfileState extends State<EditProfile> {
                             });
                             Util_.showErrorDialog(context, error.toString());
                           });
-                        }).onError((error, stackTrace) {
-                          setState(() {
-                            loading = false;
+                        } else {
+                          ///Set Data with image
+                          firebase_storage.Reference storageRef = firebase_storage
+                              .FirebaseStorage.instance
+                              .ref("UsersImages/$userId");
+
+                          firebase_storage.UploadTask imageUploadTask =
+                              storageRef.putFile(titleImage!.absolute);
+                          await Future.value(imageUploadTask).then((value) async {
+                            var imageUrl = await storageRef.getDownloadURL();
+                            ref.set({
+                              if (email != null) 'email': email,
+                              'name': name,
+                              if (phoneNumber != null) 'phoneNumber': phoneNumber,
+                              'userImage': imageUrl
+                            }).then((_) {
+                              Util_.showToast("details Updated Successfully");
+                              setState(() {
+                                loading = false;
+                              });
+                            }).onError((error, stackTrace) {
+                              setState(() {
+                                loading = false;
+                              });
+                              Util_.showErrorDialog(context, error.toString());
+                            });
+                          }).onError((error, stackTrace) {
+                            setState(() {
+                              loading = false;
+                            });
+                            Util_.showErrorDialog(context, error.toString());
                           });
-                          Util_.showErrorDialog(context, error.toString());
-                        });
-                      }
-                    }),
-              )
-            ],
+                        }
+                      }),
+                )
+              ],
+            ),
           ),
         ),
       ),

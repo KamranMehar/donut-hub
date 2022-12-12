@@ -1,6 +1,7 @@
 
 import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
+import 'package:donut_hub/ui_pages/edit_profile_page.dart';
 import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:donut_hub/util/roundI_icon_button.dart';
@@ -94,13 +95,45 @@ class _HomeState extends State<Home> {
                   padding: const EdgeInsets.all(8),
                   child: Hero(
                     tag: 'profile',
-                    child: ProfileIcon(
-                        hight:60,
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                      },
+                      child: Container(
+                        height: 60,
                         width: 60,
-                        iconPath: 'lib/icons/avatar_women.json',
-                        onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const ProfilePage()));
-                    }),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.shade500,
+                                  spreadRadius: 2,
+                                  blurRadius: 5.0,
+                                  offset: const Offset(2,2)
+                              ),
+                              const BoxShadow(
+                                  color: Colors.white,
+                                  spreadRadius: 2,
+                                  blurRadius: 5.0,
+                                  offset: Offset(-2,-2)
+                              )
+                            ]
+                        ),
+                        child: Column(children: [
+                          if(userImage!=null)
+                            CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 20,
+                              backgroundImage: NetworkImage(userImage!),),
+                          if(userImage==null)
+                            SizedBox(
+                                height: 35,
+                                width: 35,
+                                child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,))
+                        ],),
+                      ),
+                    ),
                   )
                 ),
                 ///Cart Icon
@@ -184,8 +217,9 @@ class _HomeState extends State<Home> {
   }
   @override
   void initState() {
- /*   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black26,));*/
+    getUserData();
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black26,));
     ///Lock orientations on Mobile Devices
     if(defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android){
       SystemChrome.setPreferredOrientations([
@@ -195,41 +229,68 @@ class _HomeState extends State<Home> {
     }
     super.initState();
   }
+  getUserData() async{
+    var userId=FirebaseAuth.instance.currentUser!.uid;
+    var ref=FirebaseDatabase.instance.ref("Users/$userId");
+    final snapshot = await ref.get();
+    if (snapshot.exists) {
+      Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
+      setState(() {
+        if(mapList['userImage']!=null){
+          userImage=mapList['userImage'];
+        }
+        if(mapList['email']!=null){
+          userEmail=mapList['email'];
+        }
+        if(mapList['name']!=null){
+          userName=mapList['name'];
+        }
+        if(mapList['phoneNumber']!=null){
+          phoneNumber=mapList['phoneNumber'];
+        }
+      });
+
+    }
+  }
+
 }
 
-class MyDrawer extends StatefulWidget {
+ class MyDrawer extends StatefulWidget {
   const MyDrawer({Key? key}) : super(key: key);
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();
 
 }
-class _MyDrawerState extends State<MyDrawer> {
+ class _MyDrawerState extends State<MyDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    getUserData();
+   // getUserData();
     return ListView(
       padding: EdgeInsets.zero,
       children: [
+        if(userImage==null)
+         const SizedBox(height: 25,),
         if(userImage!=null)
         UserAccountsDrawerHeader(
+          margin: const EdgeInsets.all(15),
             decoration: const BoxDecoration(color: Colors.pink),
-            // currentAccountPictureSiconst ze: Size(80, 80),
+           //  currentAccountPictureSize:const Size(80, 80),
             currentAccountPicture:  Padding(
-              padding: const EdgeInsets.only(bottom: 5),
+              padding: const EdgeInsets.only(bottom: 3),
               child: CircleAvatar(
                 backgroundColor: Colors.white, backgroundImage:
               NetworkImage(userImage!,),),
             ),
             accountName: HeadingText(
-                text: userName??"Not Found", color: Colors.white, isUnderline: false),
-            accountEmail: NormalText(text: userEmail??phoneNumber??"Not Found", color: Colors.grey.shade400)
+                text: userName??"Not Found", size: 22,color: Colors.white, isUnderline: false),
+            accountEmail: NormalText(text: userEmail??phoneNumber??"Not Found",size: 18, color: Colors.grey.shade400)
         ),
         ///User Detail not Found
         Visibility(
           visible: userName!=null?false:true,
-            child: HeadingText(text: "Complete Your Personal Details", color: Colors.white, isUnderline: false)),
+            child: HeadingText(text: "Complete Your Personal Details",size:15, color: Colors.white, isUnderline: false)),
         ListTile(leading: Lottie.asset('lib/icons/heart.json',),
           title: const Text('Favourites',
             style: TextStyle(fontSize: 18, color: Colors.white),),),
@@ -256,27 +317,5 @@ class _MyDrawerState extends State<MyDrawer> {
       ],
     );
   }
-  getUserData() async{
-    var userId=FirebaseAuth.instance.currentUser!.uid;
-    var ref=FirebaseDatabase.instance.ref("Users/$userId");
-    final snapshot = await ref.get();
-    if (snapshot.exists) {
-      Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
-      setState(() {
-        if(mapList['userImage']!=null){
-          userImage=mapList['userImage'];
-        }
-        if(mapList['email']!=null){
-        userEmail=mapList['email'];
-        }
-        if(mapList['name']!=null){
-        userName=mapList['name'];
-        }
-        if(mapList['phoneNumber']!=null){
-        phoneNumber=mapList['phoneNumber'];
-        }
-      });
 
-    }
-  }
 }
