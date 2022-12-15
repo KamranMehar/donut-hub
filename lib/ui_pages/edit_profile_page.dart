@@ -7,6 +7,7 @@ import 'package:donut_hub/util/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 
@@ -40,6 +41,16 @@ class _EditProfileState extends State<EditProfile> {
     TextEditingController phoneController =
         TextEditingController(text: phoneNumber);
     return MaterialApp(
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.dark,
+                statusBarBrightness: Brightness.light
+            )
+        ),
+        primarySwatch: Colors.pink,
+      ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.white,

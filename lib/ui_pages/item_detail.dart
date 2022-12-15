@@ -66,7 +66,7 @@ class _ItemDetailState extends State<ItemDetail> {
                       children: [
                         ///Ingredients
                         Padding(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(5),
                           child: HeadingText(text: "Ingredients", color: Colors.black, isUnderline: false,),
                         ),
                         ///Details Eclipse
@@ -144,14 +144,4 @@ class _ItemDetailState extends State<ItemDetail> {
       ),
     );
   }
-
- @override
- void initState() {
-   super.initState();
-   // SystemChrome.setEnabledSystemUIOverlays([]);
-   //Transparent the Status Bar :)
-   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-     statusBarColor: Colors.transparent,
-   ));
- }
 }

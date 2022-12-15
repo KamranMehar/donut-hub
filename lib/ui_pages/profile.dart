@@ -54,7 +54,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         alignment: Alignment.topLeft,
                         child: InkWell(
                             onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const Home()));
+                              //clear all screens from stack except new
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const Home())
+                                  , (route) => false);
                             }, child: SizedBox(
                             height: 60,width: 60,
                             child: Lottie.asset('lib/icons/arrow_left.json',fit: BoxFit.cover))),

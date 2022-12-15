@@ -19,8 +19,7 @@ class IngredientsEclipseShape extends StatelessWidget {
       padding: const EdgeInsets.all(5),
       child: Container(
         padding: const EdgeInsets.all(10),
-        height: 90,
-
+        //height: 90,
         decoration: BoxDecoration(
             border: Border.all(color: Colors.black,width: 2),
             borderRadius: const BorderRadius.vertical(top: Radius.elliptical(40,40),bottom: Radius.elliptical(40,40))

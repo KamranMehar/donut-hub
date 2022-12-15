@@ -1,7 +1,6 @@
 
 import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
-import 'package:donut_hub/ui_pages/edit_profile_page.dart';
 import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:donut_hub/util/roundI_icon_button.dart';
@@ -218,8 +217,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     getUserData();
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black26,));
+
     ///Lock orientations on Mobile Devices
     if(defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android){
       SystemChrome.setPreferredOrientations([
@@ -267,55 +265,72 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
    // getUserData();
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        if(userImage==null)
-         const SizedBox(height: 25,),
-        if(userImage!=null)
-        UserAccountsDrawerHeader(
-          margin: const EdgeInsets.all(15),
-            decoration: const BoxDecoration(color: Colors.pink),
-           //  currentAccountPictureSize:const Size(80, 80),
-            currentAccountPicture:  Padding(
-              padding: const EdgeInsets.only(bottom: 3),
-              child: CircleAvatar(
-                backgroundColor: Colors.white, backgroundImage:
-              NetworkImage(userImage!,),),
-            ),
-            accountName: HeadingText(
-                text: userName??"Not Found", size: 22,color: Colors.white, isUnderline: false),
-            accountEmail: NormalText(text: userEmail??phoneNumber??"Not Found",size: 18, color: Colors.grey.shade400)
-        ),
-        ///User Detail not Found
-        Visibility(
-          visible: userName!=null?false:true,
-            child: HeadingText(text: "Complete Your Personal Details",size:15, color: Colors.white, isUnderline: false)),
-        ListTile(leading: Lottie.asset('lib/icons/heart.json',),
-          title: const Text('Favourites',
-            style: TextStyle(fontSize: 18, color: Colors.white),),),
-        ListTile(leading: Lottie.asset('lib/icons/settings.json'),
-          title: const Text(
-            'Settings', style: TextStyle(fontSize: 18, color: Colors.white),),),
-        InkWell(
-          onTap: () async {
-          SharedPreferences pref=await SharedPreferences.getInstance();
-          try{
-            FirebaseAuth.instance.signOut().then((value) =>{
-              pref.setBool("isLogin", false),
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginPage()))
-            });
-          }on FirebaseAuthException catch (e){
-            Util_.showErrorDialog(context, e.message);
-          }
+    return SafeArea(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
 
-          },
-          child: ListTile(leading: Lottie.asset('lib/icons/logout.json'),
+          if(userImage==null)
+            ///Dummy drawer heading
+            UserAccountsDrawerHeader(
+              //  margin: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(color: Colors.pink),
+                //  currentAccountPictureSize:const Size(80, 80),
+                currentAccountPicture:  Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white, backgroundImage:
+                  AssetImage('lib/images/user.png'),),
+                ),
+                accountName: HeadingText(
+                    text: "", size: 22,color: Colors.white, isUnderline: false),
+                accountEmail: NormalText(text: "",size: 18, color: Colors.grey.shade400)
+            ),
+          if(userImage!=null)
+            ///Drawer heading
+          UserAccountsDrawerHeader(
+          //  margin: const EdgeInsets.all(15),
+              decoration: const BoxDecoration(color: Colors.pink),
+             //  currentAccountPictureSize:const Size(80, 80),
+              currentAccountPicture:  Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: CircleAvatar(
+                  backgroundColor: Colors.white, backgroundImage:
+                NetworkImage(userImage!,),),
+              ),
+              accountName: HeadingText(
+                  text: userName??"Not Found", size: 22,color: Colors.white, isUnderline: false),
+              accountEmail: NormalText(text: userEmail??phoneNumber??"Not Found",size: 18, color: Colors.grey.shade400)
+          ),
+          ///User Detail not Found
+          Visibility(
+            visible: userName!=null?false:true,
+              child: HeadingText(text: "Complete Your Personal Details",size:15, color: Colors.white, isUnderline: false)),
+          ListTile(leading: Lottie.asset('lib/icons/heart.json',),
+            title: const Text('Favourites',
+              style: TextStyle(fontSize: 18, color: Colors.white),),),
+          ListTile(leading: Lottie.asset('lib/icons/settings.json'),
             title: const Text(
-              'Logout', style: TextStyle(fontSize: 18, color: Colors.white),),),
-        )
-      ],
+              'Settings', style: TextStyle(fontSize: 18, color: Colors.white),),),
+          InkWell(
+            onTap: () async {
+            SharedPreferences pref=await SharedPreferences.getInstance();
+            try{
+              FirebaseAuth.instance.signOut().then((value) =>{
+                pref.setBool("isLogin", false),
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginPage()))
+              });
+            }on FirebaseAuthException catch (e){
+              Util_.showErrorDialog(context, e.message);
+            }
+
+            },
+            child: ListTile(leading: Lottie.asset('lib/icons/logout.json'),
+              title: const Text(
+                'Logout', style: TextStyle(fontSize: 18, color: Colors.white),),),
+          )
+        ],
+      ),
     );
   }
-
 }
