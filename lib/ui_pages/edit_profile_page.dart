@@ -318,7 +318,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   pickImage() async {
-    final pickerFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickerFile = await picker.pickImage(source: ImageSource.gallery,imageQuality: 40);
     setState(() {
       if (pickerFile != null) {
         titleImage = File(pickerFile.path);
