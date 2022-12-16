@@ -1,41 +1,66 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import '../util/Util.dart';
+import '../ui_pages/item_detail.dart';
 import '../util/donut_tile.dart';
 
-
 class BurgerTab extends StatelessWidget {
-  List burgerForSale = [
-    // [ donutFlavor, donutPrice, donutColor, imageName ]
-    ["Chicken Burger", "49", Colors.blue, "lib/images/chicken_burger.png"],
-    ["Cheese Burger", "45", Colors.red, "lib/images/cheese_burger.png"],
-  ];
+
+  DatabaseReference ref=FirebaseDatabase.instance.ref('Items/Burger/');
+
+  BurgerTab({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final hight=MediaQuery.of(context).size.height;
-    final width=MediaQuery.of(context).size.width;
-    return GridView.builder(
-      itemCount: burgerForSale.length,
-      padding: const EdgeInsets.all(12),
-       gridDelegate:  const SliverGridDelegateWithMaxCrossAxisExtent(
-         //  crossAxisCount: width>500? 3 :2,
-         childAspectRatio: 1/1.6,
-         maxCrossAxisExtent: 200   /* 1 / 1.6*/,
-       ),
-      itemBuilder: (context, index) {
-        return DonutTile(
-          donutFlavor: burgerForSale[index][0],
-          donutPrice: burgerForSale[index][1],
-          donutColor: burgerForSale[index][2],
-          imageName: burgerForSale[index][3], click: () {
-          ///Add to cart
-          Util_.addToCart(
-              burgerForSale[index][0],
-              burgerForSale[index][1],
-              burgerForSale[index][3]);
-        },
-        );
+    return  StreamBuilder(
+      stream: ref.onValue,
+      builder: (BuildContext context, AsyncSnapshot<DatabaseEvent> snapshot) {
+        if(!snapshot.hasData){
+          return const Center(child: CircularProgressIndicator(color: Colors.pink,));
+        }else{
+          Map<dynamic,dynamic> map= snapshot.data!.snapshot.value as dynamic;
+          List<dynamic> list=[];
+          list.clear();
+          list=map.values.toList();
+          if (kDebugMode) {
+            print(list[0]['name'].toString());
+          }
+          return GridView.builder(
+            itemCount: list.length,
+            padding: const EdgeInsets.all(12),
+            gridDelegate:  const SliverGridDelegateWithMaxCrossAxisExtent(
+                childAspectRatio: 1/1.6,
+                maxCrossAxisExtent: 200
+            ),
+            itemBuilder: (context, index) {
+              return InkWell(
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context)
+                    => ItemDetail(path:list[index]['coverImage'],
+                      name: list[index]['name'],
+                      price: list[index]['price'],
+                      detail: list[index]['details'],
+                      sugarGram: list[index]['sugarGram'],
+                      sugarPercentage: list[index]['sugarPercentage'],
+                      saltGram: list[index]['saltGram'],
+                      saltPercentage: list[index]['saltPercentage'],
+                      fatGram: list[index]['fatGram'],
+                      fatPercentage: list[index]['fatPercentage'],
+                      energyGram: list[index]['energyGram'],
+                      energyPercentage: list[index]['energyPercentage'],)));
+                  },
+                  child: DonutTile(
+                      donutFlavor: list[index]['name'],
+                      donutPrice: list[index]['price'],
+                      donutColor: Colors.pink,
+                      imageName: list[index]['titleImage'],
+                      click: (){})
+              );
+            },
+          );
+        }
       },
+
     );
   }
 }

@@ -148,6 +148,8 @@ class _AddItemState extends State<AddItem> {
                             }
                           },
                           controller: titleController,
+                          maxLines: 1,
+                          maxLength: 25,
                           decoration: const InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Title here',

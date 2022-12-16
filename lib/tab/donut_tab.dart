@@ -1,55 +1,66 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../ui_pages/item_detail.dart';
-import '../util/Util.dart';
 import '../util/donut_tile.dart';
 
 class DonutTab extends StatelessWidget {
-  // list of donuts
-  List donutsOnSale = [
-    // [ donutFlavor, donutPrice, donutColor, imageName ,detailImagePath]
-    ["Ice Cream", "36", Colors.blue, "lib/images/icecream_donut.png","lib/images/donuts/ice_cream_donut.jpg"],
-    ["Strawberry", "45", Colors.red, "lib/images/strawberry_donut.png","lib/images/donuts/strawberry_donut.jpg"],
-    ["Grape Ape", "84", Colors.purple, "lib/images/grape_donut.png","lib/images/donuts/grape_donut.jpg"],
-    ["Choco", "95", Colors.brown, "lib/images/chocolate_donut.png","lib/images/donuts/chocolate_donut.jpg"],
-  ];
 
-
+DatabaseReference ref=FirebaseDatabase.instance.ref('Items/Donut/');
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,));
-    return  GridView.builder(
-        itemCount: donutsOnSale.length,
-        padding: const EdgeInsets.all(12),
-        gridDelegate:  const SliverGridDelegateWithMaxCrossAxisExtent(
-          //  crossAxisCount: width>500? 3 :2,
-          childAspectRatio: 1/1.6,
-          maxCrossAxisExtent: 200   /* 1 / 1.6*/,
-        ),
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: (){
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => ItemDetail(path:donutsOnSale[index][4],
-                name: donutsOnSale[index][0],
-                price: donutsOnSale[index][1], )));
-            },
-            child: DonutTile(
-              donutFlavor: donutsOnSale[index][0],
-              donutPrice: donutsOnSale[index][1],
-              donutColor: donutsOnSale[index][2],
-              imageName: donutsOnSale[index][3],
-              click: () { 
-                ///Add to cart
-                Util_.addToCart(
-                    donutsOnSale[index][0],
-                    donutsOnSale[index][1],
-                    donutsOnSale[index][3]);
-              },
-            ),
-          );
-        },
-      );
-  }
 
+    return  StreamBuilder(
+      stream: ref.onValue,
+      builder: (BuildContext context, AsyncSnapshot<DatabaseEvent> snapshot) {
+       if(!snapshot.hasData){
+         return const Center(child: CircularProgressIndicator(color: Colors.pink,));
+       }else{
+          Map<dynamic,dynamic> map= snapshot.data!.snapshot.value as dynamic;
+          List<dynamic> list=[];
+          list.clear();
+          list=map.values.toList();
+        if (kDebugMode) {
+          print(list[0]['name'].toString());
+        }
+          return GridView.builder(
+            itemCount: list.length,
+            padding: const EdgeInsets.all(12),
+            gridDelegate:  const SliverGridDelegateWithMaxCrossAxisExtent(
+                childAspectRatio: 1/1.6,
+                maxCrossAxisExtent: 200
+            ),
+            itemBuilder: (context, index) {
+              return InkWell(
+                onTap: (){
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context)
+                  => ItemDetail(path:list[index]['coverImage'],
+                    name: list[index]['name'],
+                    price: list[index]['price'],
+                    detail: list[index]['details'],
+                    sugarGram: list[index]['sugarGram'],
+                  sugarPercentage: list[index]['sugarPercentage'],
+                  saltGram: list[index]['saltGram'],
+                  saltPercentage: list[index]['saltPercentage'],
+                  fatGram: list[index]['fatGram'],
+                  fatPercentage: list[index]['fatPercentage'],
+                  energyGram: list[index]['energyGram'],
+                  energyPercentage: list[index]['energyPercentage'],)));
+                },
+                child: DonutTile(
+                    donutFlavor: list[index]['name'],
+                    donutPrice: list[index]['price'],
+                    donutColor: Colors.pink,
+                    imageName: list[index]['titleImage'],
+                    click: ()async{
+
+                    })
+              );
+            },
+          );
+       }
+      },
+
+    );
+  }
 }

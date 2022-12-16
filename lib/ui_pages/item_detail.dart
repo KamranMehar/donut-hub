@@ -11,10 +11,30 @@ class ItemDetail extends StatefulWidget {
   String path;
   String name;
   String price;
+  String detail;
+  int sugarGram;
+  int saltGram;
+  int fatGram;
+  int energyGram;
+  int sugarPercentage;
+  int saltPercentage;
+  int fatPercentage;
+  int energyPercentage;
+
    ItemDetail({Key? key,
      required this.price,
      required this.path,
      required this.name,
+     required this.detail,
+
+     required this.sugarGram,
+     required this.sugarPercentage,
+     required this.saltGram,
+     required this.saltPercentage,
+     required this.fatGram,
+     required this.fatPercentage,
+     required this.energyGram,
+     required this.energyPercentage,
    }) : super(key: key);
 
   @override
@@ -36,7 +56,7 @@ class _ItemDetailState extends State<ItemDetail> {
               SizedBox(
                 width: size.width,
                   height:  size. height*0.4,
-                  child: Image.asset(widget.path,fit: BoxFit.cover,)),
+                  child: Image.network(widget.path,fit: BoxFit.cover,)),
               ///App Bar
               SafeArea(
                 child: Padding(
@@ -75,23 +95,23 @@ class _ItemDetailState extends State<ItemDetail> {
                           children: [
                           IngredientsEclipseShape(
                               ingredient_name: 'Sugar',
-                              grams: 5,
-                              percentage: 8,
+                              grams: widget.sugarGram,
+                              percentage:widget.sugarPercentage,
                               color: Colors.red.shade300),
                             IngredientsEclipseShape(
                               ingredient_name: 'Salt',
-                              grams: 2,
-                              percentage: 1,
+                              grams: widget.saltGram,
+                              percentage: widget.saltGram,
                               color: Colors.yellowAccent.shade200),
                             IngredientsEclipseShape(
                               ingredient_name: 'Fat',
-                              grams: 8,
-                              percentage: 21,
+                              grams: widget.fatGram,
+                              percentage: widget.fatPercentage,
                               color: Colors.lightBlueAccent.shade200),
                             IngredientsEclipseShape(
                               ingredient_name: 'Energy',
-                              grams: 60,
-                              percentage: 48,
+                              grams: widget.energyGram,
+                              percentage: widget.energyPercentage,
                               color: Colors.orange),
                         ],),
                         ///Details Text Headings
@@ -100,11 +120,12 @@ class _ItemDetailState extends State<ItemDetail> {
                           child: HeadingText(text: 'Details', color: Colors.black,size: 22, isUnderline: false,),
                         ),
                         /// Detail Text
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: NormalText(text: "The Sweet And Subtle Salty Combo Of ChocolateMeets Caramel."
-                              " Introduce The Caramel DuoTo Your Mouth!",
+                        Expanded(
+                          child: Center(child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: NormalText(text: widget.detail,
                               color: Colors.black45,size: 15,),
+                          ),)
                         ),
                        const Expanded(child: SizedBox()),
                         ///Add To cart and price

@@ -20,8 +20,6 @@ class DonutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-final screenHight=MediaQuery.of(context).size.height;
-final screenWidth=MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Container(
@@ -43,7 +41,7 @@ final screenWidth=MediaQuery.of(context).size.width;
                       topRight: Radius.circular(borderRadius),
                     ),
                   ),
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   child: Text(
                     '\$$donutPrice',
                     style: TextStyle(
@@ -59,27 +57,41 @@ final screenWidth=MediaQuery.of(context).size.width;
             /// donut picture
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 36.0, vertical: 16),
-              child: Image.asset(imageName,fit: BoxFit.cover,),
+                  const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              child: SizedBox(
+                  height: 80,
+                  width: 80,
+                  child: Image.network(imageName,fit: BoxFit.cover,)),
             ),
 
             /// donut flavor
-            Text(
-              donutFlavor,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Text(
+                    donutFlavor,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      //fontSize: 15,
+                    ),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Dunkins',
-              style: TextStyle(color: Colors.grey[600]),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Text(
+                'Dunkins',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
             ),
 
             /// love icon + add button
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 7),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
