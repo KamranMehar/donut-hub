@@ -1,8 +1,10 @@
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
 import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:donut_hub/util/Util.dart';
+import 'package:donut_hub/util/check_internet_connection_widget.dart';
 import 'package:donut_hub/util/roundI_icon_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -66,6 +68,7 @@ class _HomeState extends State<Home> {
   ];
   @override
   Widget build(BuildContext context) {
+    Connectivity connectivity =  Connectivity() ;
     return  Scaffold(
       body: DefaultTabController(
         length: myTabs.length,
@@ -189,23 +192,30 @@ class _HomeState extends State<Home> {
                  ),
                  ///TabView
                  Expanded(
-                   child: TabBarView(
-                     children: [
-                       // donut page
-                       DonutTab(),
+                   child: StreamBuilder<ConnectivityResult>(
+                     stream: connectivity.onConnectivityChanged,
+                     builder: (context, snapshot){
+                       return CheckInternetConnectionWidget(snapshot: snapshot,
+                           widget:TabBarView(
+                             children: [
+                               // donut page
+                               DonutTab(),
 
-                       // burger page
-                       BurgerTab(),
+                               // burger page
+                               BurgerTab(),
 
-                       // smoothie page
-                       SmoothieTab(),
+                               // smoothie page
+                               SmoothieTab(),
 
-                       // pancake page
-                       PancakeTab(),
+                               // pancake page
+                               PancakeTab(),
 
-                       // pizza page
-                       PizzaTab(),
-                     ],
+                               // pizza page
+                               PizzaTab(),
+                             ],
+                           ) );
+                     }
+
                    ),
                  )
                ],

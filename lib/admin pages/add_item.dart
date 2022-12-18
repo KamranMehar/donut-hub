@@ -461,7 +461,7 @@ class _AddItemState extends State<AddItem> {
 
 
   pickImage(bool isCover) async{
-     final pickerFile=await picker.pickImage(source: ImageSource.gallery);
+     final pickerFile=await picker.pickImage(source: ImageSource.gallery,imageQuality:isCover==true?70:40);
      setState(() {
        if(pickerFile!=null){
          // setState((){allDone=true;});
