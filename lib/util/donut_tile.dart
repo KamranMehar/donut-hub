@@ -118,3 +118,102 @@ class DonutTile extends StatelessWidget {
     );
   }
 }
+
+class LoadingTile extends StatelessWidget {
+  const LoadingTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Color bgColor=Colors.grey[300]!;
+    Color fColor=Colors.grey[400]!;
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+            borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          children: [
+            /// price
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: fColor,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child:  Text(
+                    '\$   ',
+                    style: TextStyle(
+                      color: bgColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            /// donut picture
+            Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: fColor,
+              child: CircleAvatar(
+                radius: 15,
+                backgroundColor: bgColor,
+              ),),
+            ),
+
+            /// donut flavor
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Divider(
+                    thickness: 12,
+                    color: fColor,
+                  ),
+                ),
+              ),
+            ),
+
+             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Divider(thickness: 8,color: fColor,),
+            ),
+
+            /// love icon + add button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // love icon
+                  Icon(
+                    Icons.favorite,
+                    color: fColor
+                  ),
+
+                  // plus button
+                  Icon(
+                    Icons.add,
+                    color: fColor,
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}

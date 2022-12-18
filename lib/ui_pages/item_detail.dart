@@ -1,4 +1,7 @@
 
+import 'package:donut_hub/util/Util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +11,7 @@ import '../util/ingredients_eclipse_shap.dart';
 
 class ItemDetail extends StatefulWidget {
  static String id="item_detail";
+ String ref;
   String path;
   String name;
   String price;
@@ -26,6 +30,7 @@ class ItemDetail extends StatefulWidget {
      required this.path,
      required this.name,
      required this.detail,
+     required this.ref,
 
      required this.sugarGram,
      required this.sugarPercentage,
@@ -45,6 +50,7 @@ class _ItemDetailState extends State<ItemDetail> {
   @override
   Widget build(BuildContext context) {
     Size size=MediaQuery.of(context).size;
+    print("REF: "+widget.ref);
     return Scaffold(
       extendBody: true,
       body: Column(
@@ -69,7 +75,13 @@ class _ItemDetailState extends State<ItemDetail> {
                         Navigator.pop(context);
                       }, icon:  const Icon(Icons.arrow_back_ios,color: Colors.white,size: 35)),
                       Text(widget.name, style: GoogleFonts.oswald(textStyle: const TextStyle(color: Colors.white,fontSize:25,fontWeight:
-                      FontWeight.bold,)),)
+                      FontWeight.bold,)),),
+                      Spacer(),
+                      ///Admin checker
+                      if(FirebaseAuth.instance.currentUser!.uid=='wATfqu0Xt6OoSeU6ODGtxHkeR6J3')
+                      IconButton(onPressed: (){
+                        deleteItem(widget.ref);
+                      }, icon:const Icon(Icons.delete,color: Colors.white,),)
                     ],),
                   ),
                 ),
@@ -164,5 +176,15 @@ class _ItemDetailState extends State<ItemDetail> {
         ],
       ),
     );
+  }
+  deleteItem(String path)async{
+    DatabaseReference ref=FirebaseDatabase.instance.ref(path);
+    ref.remove().then((value) {
+      Navigator.pop(context);
+    Util_.showToast("${widget.name} is Deleted Successfully");
+    })
+        .onError((error, stackTrace) {
+          Util_.showErrorDialog(context, "Unable To Delete Item\nError: $error");
+    });
   }
 }

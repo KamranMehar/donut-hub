@@ -4,7 +4,6 @@ import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
 import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:donut_hub/util/Util.dart';
-import 'package:donut_hub/util/check_internet_connection_widget.dart';
 import 'package:donut_hub/util/roundI_icon_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -20,6 +19,7 @@ import '../tab/donut_tab.dart';
 import '../tab/pancake_tab.dart';
 import '../tab/pizza_tab.dart';
 import '../tab/smoothie_tab.dart';
+import '../util/check_internet_connection_widget.dart';
 import '../util/constents.dart';
 import '../util/my_tab.dart';
 import '../util/round_profile_icon.dart';
@@ -69,6 +69,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Connectivity connectivity =  Connectivity() ;
+    bool isAdmin=(FirebaseAuth.instance.currentUser!.uid=='wATfqu0Xt6OoSeU6ODGtxHkeR6J3')?true:false;
     return  Scaffold(
       body: DefaultTabController(
         length: myTabs.length,
@@ -156,12 +157,12 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
-           floatingActionButton: FloatingActionButton(
+           floatingActionButton:isAdmin?FloatingActionButton(
              heroTag: 'addItem',
              onPressed: (){
-             Navigator.push(context, MaterialPageRoute(builder: (context)=> AddItem()));
-           },
-           child: Icon(Icons.add,color: Colors.white,),),
+               Navigator.push(context, MaterialPageRoute(builder: (context)=> AddItem()));
+             },
+             child: Icon(Icons.add,color: Colors.white,),): SizedBox(),
            ///Drawer
            drawer:  Drawer(width: 250,
              backgroundColor: Colors.pink.withOpacity(0.5),
