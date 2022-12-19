@@ -55,8 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: InkWell(
                             onTap: (){
                               //clear all screens from stack except new
-                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const Home())
-                                  , (route) => false);
+                              Navigator.pop(context);
                             }, child: SizedBox(
                             height: 60,width: 60,
                             child: Lottie.asset('lib/icons/arrow_left.json',fit: BoxFit.cover))),
@@ -81,6 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: HeadingText(text: userName??"", color: Colors.black, isUnderline: false,size: 25,)),
                       const SizedBox(height: 5,),
                       ///email
+                      if(userEmail!=null)
                       Hero(
                           tag: 'email',
                           child: NormalText(text: userEmail??"", color: Colors.grey.shade800,size: 18,)),

@@ -69,7 +69,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Connectivity connectivity =  Connectivity() ;
-    bool isAdmin=(FirebaseAuth.instance.currentUser!.uid=='wATfqu0Xt6OoSeU6ODGtxHkeR6J3')?true:false;
+    bool isAdmin=(FirebaseAuth.instance.currentUser!.uid=='9IHNNPnvYZYCgQMJzJswYhVo7pl2')?true:false;
 
     return  Scaffold(
       body: DefaultTabController(

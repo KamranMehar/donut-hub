@@ -78,7 +78,7 @@ class _ItemDetailState extends State<ItemDetail> {
                       FontWeight.bold,)),),
                       Spacer(),
                       ///Admin checker
-                      if(FirebaseAuth.instance.currentUser!.uid=='wATfqu0Xt6OoSeU6ODGtxHkeR6J3')
+                      if(FirebaseAuth.instance.currentUser!.uid=='9IHNNPnvYZYCgQMJzJswYhVo7pl2')
                       IconButton(onPressed: (){
                         deleteItem(widget.ref);
                       }, icon:const Icon(Icons.delete,color: Colors.white,),)

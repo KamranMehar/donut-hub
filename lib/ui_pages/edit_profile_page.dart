@@ -62,7 +62,7 @@ class _EditProfileState extends State<EditProfile> {
                   alignment: Alignment.topLeft,
                   child: InkWell(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                        Navigator.pop(context);
                       }, child: SizedBox(
                       height: 60,width: 60,
                       child: Lottie.asset('lib/icons/arrow_left.json',fit: BoxFit.cover))),
@@ -125,6 +125,7 @@ class _EditProfileState extends State<EditProfile> {
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         fillColor: Colors.grey,
+                        labelText: "Name",
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25.0),
                           borderSide: const BorderSide(
@@ -153,6 +154,7 @@ class _EditProfileState extends State<EditProfile> {
                         controller: phoneController,
                         style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
+                          labelText: "phone",
                           fillColor: Colors.grey,
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25.0),
@@ -184,6 +186,7 @@ class _EditProfileState extends State<EditProfile> {
                         style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           fillColor: Colors.grey,
+                          labelText: "Email",
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25.0),
                             borderSide: const BorderSide(
