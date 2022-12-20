@@ -1,7 +1,8 @@
+
+import 'dart:math';
+
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../ui_pages/edit_profile_page.dart';
 import '../ui_pages/item_detail.dart';
 import '../util/constents.dart';
 import '../util/donut_tile.dart';
@@ -9,9 +10,18 @@ import '../util/donut_tile.dart';
 class DonutTab extends StatelessWidget {
 
 DatabaseReference ref=FirebaseDatabase.instance.ref('Items/Donut/');
+
+List<Color> colors=[
+      Colors.pink,
+      Colors.cyan,
+      Colors.teal,
+      Colors.deepPurple,
+      Colors.deepOrange,
+      Colors.brown
+];
+
   @override
   Widget build(BuildContext context) {
-
     return StreamBuilder(
       stream: ref.onValue,
       builder: (BuildContext context, AsyncSnapshot<DatabaseEvent> snapshot) {
@@ -41,6 +51,7 @@ DatabaseReference ref=FirebaseDatabase.instance.ref('Items/Donut/');
                   maxCrossAxisExtent: 200
               ),
               itemBuilder: (context, index) {
+                print(index%colors.length);
                 return InkWell(
                     onTap: () {
                       Navigator.of(context).push(
@@ -62,8 +73,9 @@ DatabaseReference ref=FirebaseDatabase.instance.ref('Items/Donut/');
                     child: DonutTile(
                         donutFlavor: list[index]['name'],
                         donutPrice: list[index]['price'],
-                        donutColor: Colors.pink,
+                        donutColor:colors[index%colors.length],
                         imageName: list[index]['titleImage'],
+                        ///Add To Card on Tap method
                         click: () {})
                 );
               },

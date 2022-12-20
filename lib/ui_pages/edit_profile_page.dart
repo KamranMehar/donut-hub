@@ -33,6 +33,15 @@ class _EditProfileState extends State<EditProfile> {
   bool loading = false;
   var userId = FirebaseAuth.instance.currentUser!.uid;
 
+  List<Color> colors=[
+    Colors.pink,
+    Colors.cyan,
+    Colors.teal,
+    Colors.deepPurple,
+    Colors.deepOrange,
+    Colors.brown
+  ];
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -40,19 +49,7 @@ class _EditProfileState extends State<EditProfile> {
     TextEditingController emailController = TextEditingController(text: email);
     TextEditingController phoneController =
         TextEditingController(text: phoneNumber);
-    return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-            systemOverlayStyle: SystemUiOverlayStyle(
-                statusBarColor: Colors.transparent,
-                statusBarIconBrightness: Brightness.dark,
-                statusBarBrightness: Brightness.light
-            )
-        ),
-        primarySwatch: Colors.pink,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return  Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: SafeArea(
@@ -174,7 +171,6 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                 if (email != null)
-
                   ///Email
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -283,7 +279,6 @@ class _EditProfileState extends State<EditProfile> {
             ),
           ),
         ),
-      ),
     );
   }
 

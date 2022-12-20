@@ -32,6 +32,7 @@ String? phoneNumber;
 String? userImage;
 class Home extends StatefulWidget {
   static String id="home_screen";
+  static StreamController<String> streamController=StreamController<String>.broadcast();
   const Home({Key? key}) : super(key: key);
 
   @override
@@ -42,7 +43,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   DatabaseReference userDataRef=FirebaseDatabase.instance.ref("Users/${FirebaseAuth.instance.currentUser!.uid}/");
-  StreamController<String> streamController=StreamController<String>.broadcast();
+
   /// my tabs
   List<Widget> myTabs =  [
     // donut tab
@@ -93,6 +94,7 @@ class _HomeState extends State<Home> {
                     onTap: (){
                       setState(() {
                         _scaffoldKey.currentState?.openDrawer();
+                        getUserData();
                       });
                     })
               ),
@@ -104,7 +106,7 @@ class _HomeState extends State<Home> {
                   child: Hero(
                     tag: 'profile',
                     child: StreamBuilder<String>(
-                        stream: streamController.stream,
+                        stream: Home.streamController.stream,
                         builder: (context,snapshot){
                           if(!snapshot.hasData){
                             return GestureDetector(
@@ -138,14 +140,15 @@ class _HomeState extends State<Home> {
                                     child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,)),
                               ),
                             );
-                          }else{
+                          }
+                          else{
                               return GestureDetector(
                                 onTap: (){
                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
                                 },
                                 child: Container(
-                                  height: 35,
-                                  width: 35,
+                                  height: 50,
+                                  width: 50,
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       shape: BoxShape.circle,
@@ -169,86 +172,10 @@ class _HomeState extends State<Home> {
                               )
                               );
                             }
-                            return GestureDetector(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
-                              },
-                              child: Container(
-                                height: 60,
-                                width: 60,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.grey.shade500,
-                                          spreadRadius: 2,
-                                          blurRadius: 5.0,
-                                          offset: const Offset(2,2)
-                                      ),
-                                      const BoxShadow(
-                                          color: Colors.white,
-                                          spreadRadius: 2,
-                                          blurRadius: 5.0,
-                                          offset: Offset(-2,-2)
-                                      )
-                                    ]
-                                ),
-                                child: SizedBox(
-                                    height: 35,
-                                    width: 35,
-                                    child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,)),
-                              ),
-                            );
                           }
                           )
                   )
                 ),
-               /* Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Hero(
-                      tag: 'profile',
-                      child: GestureDetector(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
-                        },
-                        child: Container(
-                          height: 60,
-                          width: 60,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.grey.shade500,
-                                    spreadRadius: 2,
-                                    blurRadius: 5.0,
-                                    offset: const Offset(2,2)
-                                ),
-                                const BoxShadow(
-                                    color: Colors.white,
-                                    spreadRadius: 2,
-                                    blurRadius: 5.0,
-                                    offset: Offset(-2,-2)
-                                )
-                              ]
-                          ),
-                          child: Column(children: [
-                            if(userImage!=null)
-                              CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 20,
-                                backgroundImage: NetworkImage(userImage!),),
-                            if(userImage==null)
-                              SizedBox(
-                                  height: 35,
-                                  width: 35,
-                                  child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,))
-                          ],),
-                        ),
-                      ),
-                    )
-                ),*/
                 ///Cart Icon
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -272,7 +199,7 @@ class _HomeState extends State<Home> {
              onPressed: (){
                Navigator.push(context, MaterialPageRoute(builder: (context)=> AddItem()));
              },
-             child: Icon(Icons.add,color: Colors.white,),): SizedBox(),
+             child: const Icon(Icons.add,color: Colors.white,),): const SizedBox(),
            ///Drawer
            drawer:  Drawer(width: 250,
              backgroundColor: Colors.pink.withOpacity(0.5),
@@ -337,9 +264,8 @@ class _HomeState extends State<Home> {
   }
   @override
   void initState() {
-    Timer.periodic(const Duration(seconds: 5), (timer) {
       getUserData();
-    });
+      Timer.periodic(const Duration(seconds: 1), (timer) { getImage();});
     ///Lock orientations on Mobile Devices
     if(defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android){
       SystemChrome.setPreferredOrientations([
@@ -358,7 +284,8 @@ class _HomeState extends State<Home> {
       setState(() {
         if(mapList['userImage']!=null){
           userImage=mapList['userImage'];
-          streamController.sink.add(userImage.toString());
+          //adding image to stream controller
+         // streamController.sink.add(userImage.toString());
         }
         if(mapList['email']!=null){
           userEmail=mapList['email'];
@@ -373,7 +300,17 @@ class _HomeState extends State<Home> {
 
     }
   }
-
+   getImage() async{
+    var userId=FirebaseAuth.instance.currentUser!.uid;
+    var ref=FirebaseDatabase.instance.ref("Users/$userId");
+    final snapshot = await ref.get();
+    if(snapshot.exists){
+      Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
+      if(mapList['userImage']!=null){
+        Home.streamController.sink.add(mapList['userImage']);
+      }
+    }
+  }
 }
 
  class MyDrawer extends StatefulWidget {

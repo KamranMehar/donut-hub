@@ -9,6 +9,15 @@ class BurgerTab extends StatelessWidget {
 
   DatabaseReference ref=FirebaseDatabase.instance.ref('Items/Burger/');
 
+  List<Color> colors=[
+    Colors.pink,
+    Colors.cyan,
+    Colors.teal,
+    Colors.deepPurple,
+    Colors.deepOrange,
+    Colors.brown
+  ];
+
   BurgerTab({super.key});
 
   @override
@@ -63,7 +72,7 @@ class BurgerTab extends StatelessWidget {
                     child: DonutTile(
                         donutFlavor: list[index]['name'],
                         donutPrice: list[index]['price'],
-                        donutColor: Colors.pink,
+                        donutColor: colors[index%colors.length],
                         imageName: list[index]['titleImage'],
                         click: () {})
                 );

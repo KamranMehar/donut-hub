@@ -67,10 +67,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: CircleAvatar(
                             radius: 53,
                             backgroundColor: Colors.purple,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.purple,
-                              radius: 50,
-                              backgroundImage:userImage!=null? NetworkImage(userImage!):const AssetImage('lib/images/user.png') as ImageProvider,
+                            child: StreamBuilder(
+                              stream: Home.streamController.stream,
+                              builder: (context,snap) {
+                                if(snap.hasData){
+                                  userImage=snap.data;
+                                }
+                                return CircleAvatar(
+                                  backgroundColor: Colors.purple,
+                                  radius: 50,
+                                  backgroundImage:userImage!=null? NetworkImage(userImage!):const AssetImage('lib/images/user.png') as ImageProvider,
+                                );
+                              }
                             ),
                           ),
                         ),),
@@ -94,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       InkWell(
                         onTap: (){
                           setState(() {
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=>EditProfile()));
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=>const EditProfile()));
                           });
                         },
                         child: Container(

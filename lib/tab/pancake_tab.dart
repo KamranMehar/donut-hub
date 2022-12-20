@@ -7,6 +7,14 @@ import '../util/donut_tile.dart';
 
 class PancakeTab extends StatelessWidget {
   DatabaseReference ref=FirebaseDatabase.instance.ref('Items/PanCakes/');
+  List<Color> colors=[
+    Colors.pink,
+    Colors.cyan,
+    Colors.teal,
+    Colors.deepPurple,
+    Colors.deepOrange,
+    Colors.brown
+  ];
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -59,7 +67,7 @@ class PancakeTab extends StatelessWidget {
                     child: DonutTile(
                         donutFlavor: list[index]['name'],
                         donutPrice: list[index]['price'],
-                        donutColor: Colors.pink,
+                        donutColor: colors[index%colors.length],
                         imageName: list[index]['titleImage'],
                         click: () {})
                 );
