@@ -127,7 +127,7 @@ class LoadingTile extends StatelessWidget {
     Color bgColor=Colors.grey[300]!;
     Color fColor=Colors.grey[400]!;
     return Padding(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
           color: bgColor,
@@ -174,23 +174,26 @@ class LoadingTile extends StatelessWidget {
             ),
 
             /// donut flavor
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Divider(
-                    thickness: 12,
-                    color: fColor,
-                  ),
-                ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Container(height: 12,width: double.infinity,
+                decoration: BoxDecoration(
+                  color: fColor,
+                  borderRadius: BorderRadius.circular(10)
+                ),),
               ),
             ),
-
+            const  SizedBox(height: 10,),
              Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Divider(thickness: 8,color: fColor,),
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Container(height: 8,width: double.infinity,
+                decoration: BoxDecoration(
+                    color: fColor,
+                    borderRadius: BorderRadius.circular(8)
+                ),),
             ),
-
+            const Spacer(),
             /// love icon + add button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 2),

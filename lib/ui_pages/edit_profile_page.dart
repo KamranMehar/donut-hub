@@ -42,7 +42,7 @@ class _EditProfileState extends State<EditProfile> {
         TextEditingController(text: phoneNumber);
     return MaterialApp(
       theme: ThemeData(
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle(
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness: Brightness.dark,

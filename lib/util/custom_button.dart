@@ -15,7 +15,7 @@ class CustomButton extends StatelessWidget {
     return InkWell(
       onTap: click,
       child: Container(
-        padding: EdgeInsets.all(10),
+        height: 40,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           color: Colors.pink,
@@ -24,13 +24,16 @@ class CustomButton extends StatelessWidget {
             BoxShadow(
               blurRadius: 5,
               color: Colors.pink.shade800,
-              offset: Offset(5, 5)
+              offset: const Offset(5, 5)
             )
           ]
         ),
         child:isLoading?
-        Center(child: CircularProgressIndicator(color: Colors.white,)):
-        Center(child: Text(text,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.white),)),
+       const Center(
+           child: SizedBox(
+               height: 30,
+               child: CircularProgressIndicator(color: Colors.white,))):
+        Center(child: Text(text,style:const TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.white),)),
       ),
     );
   }

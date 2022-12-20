@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
@@ -39,6 +41,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  DatabaseReference userDataRef=FirebaseDatabase.instance.ref("Users/${FirebaseAuth.instance.currentUser!.uid}/");
+  StreamController<String> streamController=StreamController<String>.broadcast();
   /// my tabs
   List<Widget> myTabs =  [
     // donut tab
@@ -99,47 +103,152 @@ class _HomeState extends State<Home> {
                   padding: const EdgeInsets.all(8),
                   child: Hero(
                     tag: 'profile',
-                    child: GestureDetector(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
-                      },
-                      child: Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.grey.shade500,
-                                  spreadRadius: 2,
-                                  blurRadius: 5.0,
-                                  offset: const Offset(2,2)
+                    child: StreamBuilder<String>(
+                        stream: streamController.stream,
+                        builder: (context,snapshot){
+                          if(!snapshot.hasData){
+                            return GestureDetector(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                              },
+                              child: Container(
+                                height: 60,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.shade500,
+                                          spreadRadius: 2,
+                                          blurRadius: 5.0,
+                                          offset: const Offset(2,2)
+                                      ),
+                                      const BoxShadow(
+                                          color: Colors.white,
+                                          spreadRadius: 2,
+                                          blurRadius: 5.0,
+                                          offset: Offset(-2,-2)
+                                      )
+                                    ]
+                                ),
+                                child: SizedBox(
+                                    height: 35,
+                                    width: 35,
+                                    child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,)),
                               ),
-                              const BoxShadow(
-                                  color: Colors.white,
-                                  spreadRadius: 2,
-                                  blurRadius: 5.0,
-                                  offset: Offset(-2,-2)
+                            );
+                          }else{
+                              return GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                                },
+                                child: Container(
+                                  height: 35,
+                                  width: 35,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(image: NetworkImage(snapshot.data.toString())
+                                          ,fit: BoxFit.contain),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Colors.grey.shade500,
+                                            spreadRadius: 2,
+                                            blurRadius: 5.0,
+                                            offset: const Offset(2,2)
+                                        ),
+                                        const BoxShadow(
+                                            color: Colors.white,
+                                            spreadRadius: 2,
+                                            blurRadius: 5.0,
+                                            offset: Offset(-2,-2)
+                                        )
+                                      ]
+                                  ),
                               )
-                            ]
-                        ),
-                        child: Column(children: [
-                          if(userImage!=null)
-                            CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 20,
-                              backgroundImage: NetworkImage(userImage!),),
-                          if(userImage==null)
-                            SizedBox(
-                                height: 35,
-                                width: 35,
-                                child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,))
-                        ],),
-                      ),
-                    ),
+                              );
+                            }
+                            return GestureDetector(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                              },
+                              child: Container(
+                                height: 60,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.shade500,
+                                          spreadRadius: 2,
+                                          blurRadius: 5.0,
+                                          offset: const Offset(2,2)
+                                      ),
+                                      const BoxShadow(
+                                          color: Colors.white,
+                                          spreadRadius: 2,
+                                          blurRadius: 5.0,
+                                          offset: Offset(-2,-2)
+                                      )
+                                    ]
+                                ),
+                                child: SizedBox(
+                                    height: 35,
+                                    width: 35,
+                                    child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,)),
+                              ),
+                            );
+                          }
+                          )
                   )
                 ),
+               /* Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Hero(
+                      tag: 'profile',
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                        },
+                        child: Container(
+                          height: 60,
+                          width: 60,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.shade500,
+                                    spreadRadius: 2,
+                                    blurRadius: 5.0,
+                                    offset: const Offset(2,2)
+                                ),
+                                const BoxShadow(
+                                    color: Colors.white,
+                                    spreadRadius: 2,
+                                    blurRadius: 5.0,
+                                    offset: Offset(-2,-2)
+                                )
+                              ]
+                          ),
+                          child: Column(children: [
+                            if(userImage!=null)
+                              CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 20,
+                                backgroundImage: NetworkImage(userImage!),),
+                            if(userImage==null)
+                              SizedBox(
+                                  height: 35,
+                                  width: 35,
+                                  child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,))
+                          ],),
+                        ),
+                      ),
+                    )
+                ),*/
                 ///Cart Icon
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -228,8 +337,9 @@ class _HomeState extends State<Home> {
   }
   @override
   void initState() {
-    getUserData();
-
+    Timer.periodic(const Duration(seconds: 5), (timer) {
+      getUserData();
+    });
     ///Lock orientations on Mobile Devices
     if(defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android){
       SystemChrome.setPreferredOrientations([
@@ -248,6 +358,7 @@ class _HomeState extends State<Home> {
       setState(() {
         if(mapList['userImage']!=null){
           userImage=mapList['userImage'];
+          streamController.sink.add(userImage.toString());
         }
         if(mapList['email']!=null){
           userEmail=mapList['email'];
@@ -288,8 +399,8 @@ class _HomeState extends State<Home> {
               //  margin: const EdgeInsets.all(15),
                 decoration: const BoxDecoration(color: Colors.pink),
                 //  currentAccountPictureSize:const Size(80, 80),
-                currentAccountPicture:  Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
+                currentAccountPicture: const  Padding(
+                  padding:  EdgeInsets.only(bottom: 3),
                   child: CircleAvatar(
                     backgroundColor: Colors.white, backgroundImage:
                   AssetImage('lib/images/user.png'),),
