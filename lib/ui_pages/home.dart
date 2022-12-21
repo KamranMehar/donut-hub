@@ -480,7 +480,6 @@ class _MyDrawerState extends State<MyDrawer> {
               try {
                 FirebaseAuth.instance.signOut().then((value) => {
                       pref.setBool("isLogin", false),
-                      Home.imageStreamController.close(),
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => LoginPage()))
                     });
@@ -506,10 +505,8 @@ class _MyDrawerState extends State<MyDrawer> {
     final snapshot = await ref.get();
     if (snapshot.exists) {
       Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
-setState(() {
       if (mapList['userImage'] != null) {
         userImage = mapList['userImage'];
-        print(userImage);
         //adding image to stream controller
         // streamController.sink.add(userImage.toString());
       }
@@ -522,8 +519,7 @@ setState(() {
       if (mapList['phoneNumber'] != null) {
         phoneNumber = mapList['phoneNumber'];
       }
-  });
     }
-
+    setState(() {});
   }
 }
