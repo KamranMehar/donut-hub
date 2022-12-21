@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             radius: 53,
                             backgroundColor: Colors.purple,
                             child: StreamBuilder(
-                              stream: Home.streamController.stream,
+                              stream: Home.imageStreamController.stream,
                               builder: (context,snap) {
                                 if(snap.hasData){
                                   userImage=snap.data;

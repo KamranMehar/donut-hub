@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -24,373 +23,507 @@ import '../tab/smoothie_tab.dart';
 import '../util/check_internet_connection_widget.dart';
 import '../util/constents.dart';
 import '../util/my_tab.dart';
-import '../util/round_profile_icon.dart';
 import 'cart.dart';
-String? userName;
-String? userEmail;
-String? phoneNumber;
-String? userImage;
+
+
 class Home extends StatefulWidget {
-  static String id="home_screen";
-  static StreamController<String> streamController=StreamController<String>.broadcast();
+  static String id = "home_screen";
+  static StreamController<String> imageStreamController = StreamController<String>.broadcast();
   const Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
-
 }
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  DatabaseReference userDataRef=FirebaseDatabase.instance.ref("Users/${FirebaseAuth.instance.currentUser!.uid}/");
+  DatabaseReference userDataRef = FirebaseDatabase.instance
+      .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/");
 
   /// my tabs
-  List<Widget> myTabs =  [
+  List<Widget> myTabs = [
     // donut tab
     MyTab(
-      iconPath: 'lib/icons/donut.png', label: 'Donut',
+      iconPath: 'lib/icons/donut.png',
+      label: 'Donut',
     ),
 
     // burger tab
     MyTab(
-      iconPath: 'lib/icons/burger.png', label: 'Burger',
+      iconPath: 'lib/icons/burger.png',
+      label: 'Burger',
     ),
 
     // smoothie tab
     MyTab(
-      iconPath: 'lib/icons/smoothie.png', label: 'Smoothie',
+      iconPath: 'lib/icons/smoothie.png',
+      label: 'Smoothie',
     ),
 
     // pancake tab
     MyTab(
-      iconPath: 'lib/icons/pancakes.png', label: 'PanCakes',
+      iconPath: 'lib/icons/pancakes.png',
+      label: 'PanCakes',
     ),
 
     // pizza tab
     MyTab(
-      iconPath: 'lib/icons/pizza.png', label: 'Pizza',
+      iconPath: 'lib/icons/pizza.png',
+      label: 'Pizza',
     ),
   ];
+  bool refreshPage = false;
+  bool stopTimer = false;
   @override
   Widget build(BuildContext context) {
-    Connectivity connectivity =  Connectivity() ;
-    bool isAdmin=(FirebaseAuth.instance.currentUser!.uid=='9IHNNPnvYZYCgQMJzJswYhVo7pl2')?true:false;
-
-    return  Scaffold(
+    Connectivity connectivity = Connectivity();
+    bool isAdmin = (FirebaseAuth.instance.currentUser!.uid ==
+            '9IHNNPnvYZYCgQMJzJswYhVo7pl2') ? true : false;
+    return Scaffold(
       body: DefaultTabController(
         length: myTabs.length,
         child: Scaffold(
           key: _scaffoldKey,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              ///Drawer Icon,
-              leading: Padding(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+
+            ///Drawer Icon,
+            leading: Padding(
                 padding: const EdgeInsets.all(8),
                 child: RoundIconButton(
                     hight: 60,
                     widgh: 60,
                     iconPath: 'lib/icons/menu.png',
-                    onTap: (){
+                    onTap: () {
                       setState(() {
                         _scaffoldKey.currentState?.openDrawer();
-                        getUserData();
                       });
-                    })
-              ),
-              //Account
-              actions: [
-                ///Profile Icon
-                Padding(
+                    })),
+            //Account
+            actions: [
+              ///Profile Icon
+              Padding(
                   padding: const EdgeInsets.all(8),
                   child: Hero(
-                    tag: 'profile',
-                    child: StreamBuilder<String>(
-                        stream: Home.streamController.stream,
-                        builder: (context,snapshot){
-                          if(!snapshot.hasData){
-                            return GestureDetector(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
-                              },
-                              child: Container(
-                                height: 60,
-                                width: 60,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.grey.shade500,
-                                          spreadRadius: 2,
-                                          blurRadius: 5.0,
-                                          offset: const Offset(2,2)
-                                      ),
-                                      const BoxShadow(
-                                          color: Colors.white,
-                                          spreadRadius: 2,
-                                          blurRadius: 5.0,
-                                          offset: Offset(-2,-2)
-                                      )
-                                    ]
-                                ),
-                                child: SizedBox(
-                                    height: 35,
-                                    width: 35,
-                                    child: Image.asset('lib/images/user.png',fit: BoxFit.fitHeight,)),
-                              ),
-                            );
-                          }
-                          else{
+                      tag: 'profile',
+                      child: StreamBuilder<String>(
+                          stream: Home.imageStreamController.stream,
+                          builder: (context, snapshot) {
+                            getImage();
+                            if (!snapshot.hasData) {
                               return GestureDetector(
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const ProfilePage()));
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ProfilePage()));
                                 },
                                 child: Container(
-                                  height: 50,
-                                  width: 50,
+                                  height: 60,
+                                  width: 60,
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       shape: BoxShape.circle,
-                                      image: DecorationImage(image: NetworkImage(snapshot.data.toString())
-                                          ,fit: BoxFit.contain),
                                       boxShadow: [
                                         BoxShadow(
                                             color: Colors.grey.shade500,
                                             spreadRadius: 2,
                                             blurRadius: 5.0,
-                                            offset: const Offset(2,2)
-                                        ),
+                                            offset: const Offset(2, 2)),
                                         const BoxShadow(
                                             color: Colors.white,
                                             spreadRadius: 2,
                                             blurRadius: 5.0,
-                                            offset: Offset(-2,-2)
-                                        )
-                                      ]
-                                  ),
-                              )
+                                            offset: Offset(-2, -2))
+                                      ]),
+                                  child: SizedBox(
+                                      height: 35,
+                                      width: 35,
+                                      child: Image.asset(
+                                        'lib/images/user.png',
+                                        fit: BoxFit.fitHeight,
+                                      )),
+                                ),
                               );
+                            } else {
+                              return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ProfilePage()));
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                snapshot.data.toString()),
+                                            fit: BoxFit.contain),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.grey.shade500,
+                                              spreadRadius: 2,
+                                              blurRadius: 5.0,
+                                              offset: const Offset(2, 2)),
+                                          const BoxShadow(
+                                              color: Colors.white,
+                                              spreadRadius: 2,
+                                              blurRadius: 5.0,
+                                              offset: Offset(-2, -2))
+                                        ]),
+                                  ));
                             }
-                          }
-                          )
-                  )
+                          }))),
+
+              ///Cart Icon
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Hero(
+                  tag: 'cart',
+                  child: RoundIconButton(
+                      hight: 50,
+                      widgh: 50,
+                      iconPath: 'lib/icons/cart.png',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Cart()));
+                        setState(() {});
+                      }),
                 ),
-                ///Cart Icon
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Hero(
-                    tag: 'cart',
-                    child: RoundIconButton(
-                        hight: 50,
-                        widgh: 50,
-                        iconPath: 'lib/icons/cart.png',
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context)=>const Cart()));
-                          setState(() {});
-                        }),
+              ),
+            ],
+          ),
+          floatingActionButton: isAdmin
+              ? FloatingActionButton(
+                  heroTag: 'addItem',
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => AddItem()));
+                  },
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
                   ),
+                )
+              : const SizedBox(),
+
+          ///Drawer
+          drawer: Drawer(
+            width: 250,
+            backgroundColor: Colors.pink.withOpacity(0.5),
+            child: const MyDrawer(),
+          ),
+
+          body: Column(
+            children: [
+              ///I want to EAT
+              Padding(
+                padding: const EdgeInsets.all(5),
+                child: Row(
+                  children: [
+                    Text(
+                      'I want to ',
+                      style: GoogleFonts.xanhMono(
+                          textStyle: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100,
+                      )),
+                    ),
+                    Text('EAT',
+                        style: GoogleFonts.oswald(
+                            textStyle: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ))),
+                  ],
                 ),
-              ],
-            ),
-           floatingActionButton:isAdmin?FloatingActionButton(
-             heroTag: 'addItem',
-             onPressed: (){
-               Navigator.push(context, MaterialPageRoute(builder: (context)=> AddItem()));
-             },
-             child: const Icon(Icons.add,color: Colors.white,),): const SizedBox(),
-           ///Drawer
-           drawer:  Drawer(width: 250,
-             backgroundColor: Colors.pink.withOpacity(0.5),
-             child: const MyDrawer(), ),
+              ),
 
-         body: Column(
-               children: [
-                 ///I want to EAT
-                 Padding(
-                   padding: const EdgeInsets.all(5),
-                   child: Row(
-                     children:  [
-                       Text('I want to ',style: GoogleFonts.xanhMono(textStyle: const TextStyle(fontSize: 18,color: Colors.black,fontWeight: FontWeight.w100,)),),
-                       Text('EAT',
-                           style: GoogleFonts.oswald(
-                               textStyle: const TextStyle(fontSize: 20,color: Colors.black,fontWeight: FontWeight.bold,)
-                           )),
-                     ],),
-                 ),
-                 ///TabBar
-                 Padding(
-                   padding: const EdgeInsets.symmetric(horizontal: 5),
-                   child: TabBar(tabs: myTabs,
-                   indicator: BoxDecoration(
-                     border: Border.all(color: Colors.pink,width: 2),
-                     borderRadius: BorderRadius.circular(15)
-                   ),),
-                 ),
-                 ///TabView
-                 Expanded(
-                   child: StreamBuilder<ConnectivityResult>(
-                     stream: connectivity.onConnectivityChanged,
-                     builder: (context, snapshot){
-                       return CheckInternetConnectionWidget(snapshot: snapshot,
-                           widget:TabBarView(
-                             children: [
-                               // donut page
-                               DonutTab(),
+              ///TabBar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: TabBar(
+                  tabs: myTabs,
+                  indicator: BoxDecoration(
+                      border: Border.all(color: Colors.pink, width: 2),
+                      borderRadius: BorderRadius.circular(15)),
+                ),
+              ),
 
-                               // burger page
-                               BurgerTab(),
+              ///TabView
+              Expanded(
+                child: StreamBuilder<ConnectivityResult>(
+                    stream: connectivity.onConnectivityChanged,
+                    builder: (context, snapshot) {
+                      return CheckInternetConnectionWidget(
+                        snapshot: snapshot,
+                        widget: TabBarView(
+                          children: [
+                            // donut page
+                            DonutTab(),
 
-                               // smoothie page
-                               SmoothieTab(),
+                            // burger page
+                            BurgerTab(),
 
-                               // pancake page
-                               PancakeTab(),
+                            // smoothie page
+                            SmoothieTab(),
 
-                               // pizza page
-                               PizzaTab(),
-                             ],
-                           ) );
-                     }
+                            // pancake page
+                            PancakeTab(),
 
-                   ),
-                 )
-               ],
-             ),
+                            // pizza page
+                            PizzaTab(),
+                          ],
+                        ),
+                        changeDefault: refreshPage,
+                        onReTry: () {
+                          // initState();
+                          setState(() {
+                            refreshPage = true;
+                          });
+                        },
+                      );
+                    }),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
+
   @override
   void initState() {
-      getUserData();
-      Timer.periodic(const Duration(seconds: 1), (timer) { getImage();});
+    Timer.periodic(const Duration(seconds: 3), (timer) {
+      getImage();
+    });
+
     ///Lock orientations on Mobile Devices
-    if(defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android){
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown
-      ]);
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android) {
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
     super.initState();
   }
-  getUserData() async{
-    var userId=FirebaseAuth.instance.currentUser!.uid;
-    var ref=FirebaseDatabase.instance.ref("Users/$userId");
-    final snapshot = await ref.get();
-    if (snapshot.exists) {
-      Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
-      setState(() {
-        if(mapList['userImage']!=null){
-          userImage=mapList['userImage'];
-          //adding image to stream controller
-         // streamController.sink.add(userImage.toString());
-        }
-        if(mapList['email']!=null){
-          userEmail=mapList['email'];
-        }
-        if(mapList['name']!=null){
-          userName=mapList['name'];
-        }
-        if(mapList['phoneNumber']!=null){
-          phoneNumber=mapList['phoneNumber'];
-        }
-      });
 
-    }
-  }
-   getImage() async{
-    var userId=FirebaseAuth.instance.currentUser!.uid;
-    var ref=FirebaseDatabase.instance.ref("Users/$userId");
-    final snapshot = await ref.get();
-    if(snapshot.exists){
-      Map<dynamic,dynamic> mapList=snapshot.value as dynamic;
-      if(mapList['userImage']!=null){
-        Home.streamController.sink.add(mapList['userImage']);
+  getImage() async {
+    if (FirebaseAuth.instance.currentUser != null) {
+      var userId = FirebaseAuth.instance.currentUser!.uid;
+      var ref = FirebaseDatabase.instance.ref("Users/$userId");
+      final snapshot = await ref.get();
+      if (snapshot.exists) {
+        if (snapshot.value != null) {
+          Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+          if (mapList['userImage'] != null) {
+            Home.imageStreamController.sink.add(mapList['userImage']);
+          }
+        }
       }
     }
   }
 }
 
- class MyDrawer extends StatefulWidget {
+class MyDrawer extends StatefulWidget {
   const MyDrawer({Key? key}) : super(key: key);
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();
-
 }
- class _MyDrawerState extends State<MyDrawer> {
 
+class _MyDrawerState extends State<MyDrawer> {
+
+  String? userName;
+  String? userEmail;
+  String? phoneNumber;
+  String? userImage;
   @override
   Widget build(BuildContext context) {
-   // getUserData();
+    getUserData();
     return SafeArea(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-
-          if(userImage==null)
+          if (userImage == null)
             ///Dummy drawer heading
             UserAccountsDrawerHeader(
-              //  margin: const EdgeInsets.all(15),
+                //  margin: const EdgeInsets.all(15),
                 decoration: const BoxDecoration(color: Colors.pink),
                 //  currentAccountPictureSize:const Size(80, 80),
-                currentAccountPicture: const  Padding(
-                  padding:  EdgeInsets.only(bottom: 3),
+                currentAccountPicture: const Padding(
+                  padding: EdgeInsets.only(bottom: 3),
                   child: CircleAvatar(
-                    backgroundColor: Colors.white, backgroundImage:
-                  AssetImage('lib/images/user.png'),),
+                    backgroundColor: Colors.white,
+                    backgroundImage: AssetImage('lib/images/user.png'),
+                  ),
                 ),
                 accountName: HeadingText(
-                    text: "", size: 22,color: Colors.white, isUnderline: false),
-                accountEmail: NormalText(text: "",size: 18, color: Colors.grey.shade400)
-            ),
-          if(userImage!=null)
+                    text: "",
+                    size: 22,
+                    color: Colors.white,
+                    isUnderline: false),
+                accountEmail: NormalText(
+                    text: "", size: 18, color: Colors.grey.shade400)),
+          if (userImage != null)
+
             ///Drawer heading
-          UserAccountsDrawerHeader(
-          //  margin: const EdgeInsets.all(15),
-              decoration: const BoxDecoration(color: Colors.pink),
-             //  currentAccountPictureSize:const Size(80, 80),
-              currentAccountPicture:  Padding(
-                padding: const EdgeInsets.only(bottom: 3),
-                child: CircleAvatar(
-                  backgroundColor: Colors.white, backgroundImage:
-                NetworkImage(userImage!,),),
-              ),
-              accountName: HeadingText(
-                  text: userName??"Not Found", size: 22,color: Colors.white, isUnderline: false),
-              accountEmail: NormalText(text: userEmail??phoneNumber??"Not Found",size: 18, color: Colors.grey.shade400)
-          ),
+            UserAccountsDrawerHeader(
+                //  margin: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(color: Colors.pink),
+                //  currentAccountPictureSize:const Size(80, 80),
+                currentAccountPicture: Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child:
+                  /*StreamBuilder<String>(
+                      stream: Home.imageStreamController.stream,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                      const ProfilePage()));
+                            },
+                            child: Container(
+                              height: 60,
+                              width: 60,
+                              decoration:const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                              ),
+                              child: Image.asset(
+                                'lib/images/user.png',
+                                fit: BoxFit.fitHeight,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        const ProfilePage()));
+                              },
+                              child: Container(
+                                height: 50,
+                                width: 50,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                        image: NetworkImage(
+                                            snapshot.data.toString()),
+                                        fit: BoxFit.contain),),
+                              ));
+                        }
+                      })*/
+
+                   CircleAvatar(
+                    backgroundColor: Colors.white,
+                    backgroundImage: NetworkImage(
+                      userImage!,
+                    ),
+                  ),
+                ),
+                accountName: HeadingText(
+                    text: userName ?? "Not Found",
+                    size: 22,
+                    color: Colors.white,
+                    isUnderline: false),
+                accountEmail: NormalText(
+                    text: userEmail ?? phoneNumber ?? "Not Found",
+                    size: 18,
+                    color: Colors.grey.shade400)),
+
           ///User Detail not Found
           Visibility(
-            visible: userName!=null?false:true,
-              child: HeadingText(text: "Complete Your Personal Details",size:15, color: Colors.white, isUnderline: false)),
-          ListTile(leading: Lottie.asset('lib/icons/heart.json',),
-            title: const Text('Favourites',
-              style: TextStyle(fontSize: 18, color: Colors.white),),),
-          ListTile(leading: Lottie.asset('lib/icons/settings.json'),
+              visible: userName != null ? false : true,
+              child: HeadingText(
+                  text: "Complete Your Personal Details",
+                  size: 15,
+                  color: Colors.white,
+                  isUnderline: false)),
+          ListTile(
+            leading: Lottie.asset(
+              'lib/icons/heart.json',
+            ),
             title: const Text(
-              'Settings', style: TextStyle(fontSize: 18, color: Colors.white),),),
+              'Favourites',
+              style: TextStyle(fontSize: 18, color: Colors.white),
+            ),
+          ),
+          ListTile(
+            leading: Lottie.asset('lib/icons/settings.json'),
+            title: const Text(
+              'Settings',
+              style: TextStyle(fontSize: 18, color: Colors.white),
+            ),
+          ),
           InkWell(
             onTap: () async {
-            SharedPreferences pref=await SharedPreferences.getInstance();
-            try{
-              FirebaseAuth.instance.signOut().then((value) =>{
-                pref.setBool("isLogin", false),
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginPage()))
-              });
-            }on FirebaseAuthException catch (e){
-              Util_.showErrorDialog(context, e.message);
-            }
-
+              SharedPreferences pref = await SharedPreferences.getInstance();
+              try {
+                FirebaseAuth.instance.signOut().then((value) => {
+                      pref.setBool("isLogin", false),
+                      Home.imageStreamController.close(),
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => LoginPage()))
+                    });
+              } on FirebaseAuthException catch (e) {
+                Util_.showErrorDialog(context, e.message);
+              }
             },
-            child: ListTile(leading: Lottie.asset('lib/icons/logout.json'),
+            child: ListTile(
+              leading: Lottie.asset('lib/icons/logout.json'),
               title: const Text(
-                'Logout', style: TextStyle(fontSize: 18, color: Colors.white),),),
+                'Logout',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
           )
         ],
       ),
     );
+  }
+  getUserData() async {
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    var ref = FirebaseDatabase.instance.ref("Users/$userId");
+    final snapshot = await ref.get();
+    if (snapshot.exists) {
+      Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+setState(() {
+      if (mapList['userImage'] != null) {
+        userImage = mapList['userImage'];
+        print(userImage);
+        //adding image to stream controller
+        // streamController.sink.add(userImage.toString());
+      }
+      if (mapList['email'] != null) {
+        userEmail = mapList['email'];
+      }
+      if (mapList['name'] != null) {
+        userName = mapList['name'];
+      }
+      if (mapList['phoneNumber'] != null) {
+        phoneNumber = mapList['phoneNumber'];
+      }
+  });
+    }
+
   }
 }

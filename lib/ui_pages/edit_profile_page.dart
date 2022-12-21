@@ -49,7 +49,21 @@ class _EditProfileState extends State<EditProfile> {
     TextEditingController emailController = TextEditingController(text: email);
     TextEditingController phoneController =
         TextEditingController(text: phoneNumber);
-    return  Scaffold(
+    return  MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                //for Android devices
+                statusBarIconBrightness: Brightness.dark,
+                //for IOS Devices
+                statusBarBrightness: Brightness.light
+            )
+        ),
+        primarySwatch: Colors.pink,
+      ),
+      home: Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: SafeArea(
@@ -84,9 +98,9 @@ class _EditProfileState extends State<EditProfile> {
                           backgroundImage: titleImage != null
                               ? FileImage(titleImage!.absolute)
                               : image != null
-                                  ? NetworkImage(image!)
-                                  : const AssetImage('lib/images/user.png')
-                                      as ImageProvider,
+                              ? NetworkImage(image!)
+                              : const AssetImage('lib/images/user.png')
+                          as ImageProvider,
                           child: Align(
                             alignment: Alignment.bottomRight,
                             child: GestureDetector(
@@ -101,10 +115,10 @@ class _EditProfileState extends State<EditProfile> {
                                     color: Colors.black.withOpacity(0.4)),
                                 child: const Center(
                                     child: Text(
-                                  'Change',
-                                  style:
+                                      'Change',
+                                      style:
                                       TextStyle(color: Colors.white, fontSize: 12),
-                                )),
+                                    )),
                               ),
                             ),
                           ),
@@ -171,7 +185,7 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                 if (email != null)
-                  ///Email
+                ///Email
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Hero(
@@ -210,7 +224,7 @@ class _EditProfileState extends State<EditProfile> {
                       click: () async {
                         FocusManager.instance.primaryFocus?.unfocus();
                         DatabaseReference ref =
-                            FirebaseDatabase.instance.ref("Users/$userId");
+                        FirebaseDatabase.instance.ref("Users/$userId");
                         setState(() {
                           if (email != null) {
                             email = emailController.text;
@@ -247,7 +261,7 @@ class _EditProfileState extends State<EditProfile> {
                               .ref("UsersImages/$userId");
 
                           firebase_storage.UploadTask imageUploadTask =
-                              storageRef.putFile(titleImage!.absolute);
+                          storageRef.putFile(titleImage!.absolute);
                           await Future.value(imageUploadTask).then((value) async {
                             var imageUrl = await storageRef.getDownloadURL();
                             ref.set({
@@ -279,6 +293,7 @@ class _EditProfileState extends State<EditProfile> {
             ),
           ),
         ),
+      ),
     );
   }
 
@@ -291,7 +306,7 @@ class _EditProfileState extends State<EditProfile> {
       setState(() {
         if (mapList['userImage'] != null) {
           image = mapList['userImage'];
-          print(userImage);
+
           setState(() {});
         }
         if (mapList['email'] != null) {

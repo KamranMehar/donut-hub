@@ -51,7 +51,6 @@ List<Color> colors=[
                   maxCrossAxisExtent: 200
               ),
               itemBuilder: (context, index) {
-                print(index%colors.length);
                 return InkWell(
                     onTap: () {
                       Navigator.of(context).push(
