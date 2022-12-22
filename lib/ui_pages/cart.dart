@@ -99,7 +99,7 @@ class _CartState extends State<Cart> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getData();
+   // getData();
   }
   
   getData()async{

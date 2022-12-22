@@ -31,7 +31,7 @@ List<Color> colors=[
 Connectivity connectivity = Connectivity();
 
 bool refreshPage = false;
-int counter=1;
+
   @override
   Widget build(BuildContext context) {
     return   StreamBuilder<ConnectivityResult>(
@@ -95,7 +95,7 @@ int counter=1;
                         click: () async {
                           var orderID=DateTime.now().millisecondsSinceEpoch;
                           DatabaseReference reference=FirebaseDatabase.instance
-                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/Donuts$orderID");
+                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/Donuts/$orderID");
                                 reference.set({
                                   'name':list[index]['name'],
                                   'price':list[index]['price'],
@@ -113,7 +113,7 @@ int counter=1;
                                   'energyPercentage':list[index]['energyPercentage'],
 
                                 }).then((value) {
-                                  Home.updateCartBadge(counter++);
+                                  Home.updateCartBadge();
                                   Util_.showToast(list[index]['name']+" Added To Cart");
                                 }).onError((error, stackTrace) {
                                   Util_.showToast(error.toString());

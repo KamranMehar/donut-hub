@@ -30,6 +30,8 @@ import 'cart.dart';
 
 class Home extends StatefulWidget {
   static String id = "home_screen";
+  static bool showCartBadge = false;
+ static int counterCartBadge = 0;
   static StreamController<String> imageStreamController = StreamController<String>.broadcast();
   static StreamController<String> phoneStreamController = StreamController<String>.broadcast();
   static StreamController<String> emailStreamController = StreamController<String>.broadcast();
@@ -39,8 +41,8 @@ class Home extends StatefulWidget {
 static setStateHome(){
 
 }
-  static updateCartBadge(int num){
-  cartBadgeStreamCn.sink.add(num);
+  static updateCartBadge(){
+  cartBadgeStreamCn.sink.add(counterCartBadge++);
   }
   static getUserData() async {
     if (FirebaseAuth.instance.currentUser != null) {
@@ -108,9 +110,6 @@ class _HomeState extends State<Home> {
       label: 'Pizza',
     ),
   ];
-  _setStateHome(){
-  setState(() {});
-  }
   @override
   Widget build(BuildContext context) {
 
@@ -228,16 +227,16 @@ class _HomeState extends State<Home> {
                   child: StreamBuilder<int>(
                     stream: Home.cartBadgeStreamCn.stream,
                     builder: (context,snap) {
-                      bool showBadge=false;
-                      if(snap.hasData){
-                        showBadge=true;
-                      }else{
-                        showBadge=false;
-                      }
+                        if(snap.hasData){
+                          Home.showCartBadge=true;
+                        }else{
+                          Home.showCartBadge=true;
+                        }
+
                       return Badge(
                         position: BadgePosition.topEnd(top: -6,end: -5),
-                        showBadge:showBadge,
-                        badgeContent:  Text(snap.data.toString(),style:const TextStyle(color: Colors.white),),
+                        showBadge:Home.counterCartBadge==0?false:true,
+                        badgeContent:  Text( Home.counterCartBadge.toString(),style:const TextStyle(color: Colors.white),),
                         badgeColor: Colors.pink,
                         child: RoundIconButton(
                             hight: 50,
