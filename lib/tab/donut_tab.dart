@@ -1,5 +1,6 @@
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:donut_hub/ui_pages/home.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -30,7 +31,7 @@ List<Color> colors=[
 Connectivity connectivity = Connectivity();
 
 bool refreshPage = false;
-
+int counter=1;
   @override
   Widget build(BuildContext context) {
     return   StreamBuilder<ConnectivityResult>(
@@ -94,7 +95,7 @@ bool refreshPage = false;
                         click: () async {
                           var orderID=DateTime.now().millisecondsSinceEpoch;
                           DatabaseReference reference=FirebaseDatabase.instance
-                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderID");
+                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/Donuts$orderID");
                                 reference.set({
                                   'name':list[index]['name'],
                                   'price':list[index]['price'],
@@ -112,6 +113,7 @@ bool refreshPage = false;
                                   'energyPercentage':list[index]['energyPercentage'],
 
                                 }).then((value) {
+                                  Home.updateCartBadge(counter++);
                                   Util_.showToast(list[index]['name']+" Added To Cart");
                                 }).onError((error, stackTrace) {
                                   Util_.showToast(error.toString());

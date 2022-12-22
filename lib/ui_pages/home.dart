@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:badges/badges.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
@@ -32,8 +34,14 @@ class Home extends StatefulWidget {
   static StreamController<String> phoneStreamController = StreamController<String>.broadcast();
   static StreamController<String> emailStreamController = StreamController<String>.broadcast();
   static StreamController<String> nameStreamController = StreamController<String>.broadcast();
+  static StreamController<int> cartBadgeStreamCn = StreamController<int>.broadcast();
   const Home({Key? key}) : super(key: key);
+static setStateHome(){
 
+}
+  static updateCartBadge(int num){
+  cartBadgeStreamCn.sink.add(num);
+  }
   static getUserData() async {
     if (FirebaseAuth.instance.currentUser != null) {
       var userId = FirebaseAuth.instance.currentUser!.uid;
@@ -100,7 +108,9 @@ class _HomeState extends State<Home> {
       label: 'Pizza',
     ),
   ];
-
+  _setStateHome(){
+  setState(() {});
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -215,17 +225,34 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.all(8),
                 child: Hero(
                   tag: 'cart',
-                  child: RoundIconButton(
-                      hight: 50,
-                      widgh: 50,
-                      iconPath: 'lib/icons/cart.png',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Cart()));
-                        setState(() {});
-                      }),
+                  child: StreamBuilder<int>(
+                    stream: Home.cartBadgeStreamCn.stream,
+                    builder: (context,snap) {
+                      bool showBadge=false;
+                      if(snap.hasData){
+                        showBadge=true;
+                      }else{
+                        showBadge=false;
+                      }
+                      return Badge(
+                        position: BadgePosition.topEnd(top: -6,end: -5),
+                        showBadge:showBadge,
+                        badgeContent:  Text(snap.data.toString(),style:const TextStyle(color: Colors.white),),
+                        badgeColor: Colors.pink,
+                        child: RoundIconButton(
+                            hight: 50,
+                            widgh: 50,
+                            iconPath: 'lib/icons/cart.png',
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Cart()));
+                              setState(() {});
+                            }),
+                      );
+                    }
+                  ),
                 ),
               ),
             ],
