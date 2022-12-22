@@ -95,7 +95,7 @@ bool refreshPage = false;
                         click: () async {
                           var orderID=DateTime.now().millisecondsSinceEpoch;
                           DatabaseReference reference=FirebaseDatabase.instance
-                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/Donuts/$orderID");
+                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderID");
                                 reference.set({
                                   'name':list[index]['name'],
                                   'price':list[index]['price'],

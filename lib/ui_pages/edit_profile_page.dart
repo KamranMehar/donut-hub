@@ -301,7 +301,7 @@ class _EditProfileState extends State<EditProfile> {
   getData() async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("Users/$userId");
     final snapshot = await ref.get();
-    print(userId);
+
     if (snapshot.exists) {
       Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
       setState(() {

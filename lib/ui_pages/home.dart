@@ -41,8 +41,21 @@ class Home extends StatefulWidget {
 static setStateHome(){
 
 }
-  static updateCartBadge(){
-  cartBadgeStreamCn.sink.add(counterCartBadge++);
+  static updateCartBadge()async{
+  DatabaseReference ref=FirebaseDatabase.instance
+      .ref("Users/"+FirebaseAuth.instance.currentUser!.uid+"/Cart");
+  final snapshot = await ref.get();
+  if(snapshot.exists){
+    Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+
+    if(mapList!=null){
+      showCartBadge=true;
+      cartBadgeStreamCn.sink.add(mapList.length);
+    }else{
+      showCartBadge=false;
+    }
+  }
+
   }
   static getUserData() async {
     if (FirebaseAuth.instance.currentUser != null) {
@@ -227,16 +240,11 @@ class _HomeState extends State<Home> {
                   child: StreamBuilder<int>(
                     stream: Home.cartBadgeStreamCn.stream,
                     builder: (context,snap) {
-                        if(snap.hasData){
-                          Home.showCartBadge=true;
-                        }else{
-                          Home.showCartBadge=true;
-                        }
 
                       return Badge(
                         position: BadgePosition.topEnd(top: -6,end: -5),
-                        showBadge:Home.counterCartBadge==0?false:true,
-                        badgeContent:  Text( Home.counterCartBadge.toString(),style:const TextStyle(color: Colors.white),),
+                        showBadge:snap.hasData,
+                        badgeContent:  Text(snap.data!=null? snap.data.toString():"",style:const TextStyle(color: Colors.white),),
                         badgeColor: Colors.pink,
                         child: RoundIconButton(
                             hight: 50,
@@ -345,6 +353,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    Timer.periodic(Duration(seconds: 5), (timer) {Home.updateCartBadge(); });
      Home. getUserData();
     ///Lock orientations on Mobile Devices
     if (defaultTargetPlatform == TargetPlatform.iOS ||
