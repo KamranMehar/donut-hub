@@ -273,7 +273,7 @@ class _EditProfileState extends State<EditProfile> {
                               setState(() {
                                 loading = false;
                               });
-                              Home.getImage();
+                              Home.getUserData();
                             }).onError((error, stackTrace) {
                               setState(() {
                                 loading = false;

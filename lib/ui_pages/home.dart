@@ -29,9 +29,12 @@ import 'cart.dart';
 class Home extends StatefulWidget {
   static String id = "home_screen";
   static StreamController<String> imageStreamController = StreamController<String>.broadcast();
+  static StreamController<String> phoneStreamController = StreamController<String>.broadcast();
+  static StreamController<String> emailStreamController = StreamController<String>.broadcast();
+  static StreamController<String> nameStreamController = StreamController<String>.broadcast();
   const Home({Key? key}) : super(key: key);
 
-  static getImage() async {
+  static getUserData() async {
     if (FirebaseAuth.instance.currentUser != null) {
       var userId = FirebaseAuth.instance.currentUser!.uid;
       var ref = FirebaseDatabase.instance.ref("Users/$userId");
@@ -42,10 +45,20 @@ class Home extends StatefulWidget {
           if (mapList['userImage'] != null) {
             Home.imageStreamController.sink.add(mapList['userImage']);
           }
+          if (mapList['email'] != null) {
+            emailStreamController.sink.add(mapList['email']);
+          }
+          if (mapList['name'] != null) {
+            nameStreamController.sink.add(mapList['name']);
+          }
+          if (mapList['phoneNumber'] != null) {
+            phoneStreamController.sink.add( mapList['phoneNumber']);
+          }
         }
       }
     }
   }
+
   @override
   State<Home> createState() => _HomeState();
 }
@@ -124,7 +137,7 @@ class _HomeState extends State<Home> {
                       child: StreamBuilder<String>(
                           stream: Home.imageStreamController.stream,
                           builder: (context, snapshot) {
-                            Home.getImage();
+                            Home.getUserData();
                             if (!snapshot.hasData) {
                               return GestureDetector(
                                 onTap: () {
@@ -194,7 +207,8 @@ class _HomeState extends State<Home> {
                                         ]),
                                   ));
                             }
-                          }))),
+                          }))
+              ),
 
               ///Cart Icon
               Padding(
@@ -305,7 +319,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-     Home. getImage();
+     Home. getUserData();
     ///Lock orientations on Mobile Devices
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android) {
@@ -324,72 +338,100 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-
-  String? userName;
-  String? userEmail;
-  String? phoneNumber;
-  String? userImage;
   @override
   Widget build(BuildContext context) {
-    getUserData();
     return SafeArea(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          if (userImage == null)
-            ///Dummy drawer heading
             UserAccountsDrawerHeader(
                 //  margin: const EdgeInsets.all(15),
                 decoration: const BoxDecoration(color: Colors.pink),
                 //  currentAccountPictureSize:const Size(80, 80),
-                currentAccountPicture: const Padding(
-                  padding: EdgeInsets.only(bottom: 3),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    backgroundImage: AssetImage('lib/images/user.png'),
-                  ),
+                currentAccountPicture:  StreamBuilder<String>(
+                    stream: Home.imageStreamController.stream,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Container(
+                          height: 35,
+                          width: 35,
+                          decoration:const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              ),
+                          child: SizedBox(
+                              height: 35,
+                              width: 35,
+                              child: Image.asset(
+                                'lib/images/user.png',
+                                fit: BoxFit.fitHeight,
+                              )),
+                        );
+                      } else {
+                        return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                      const ProfilePage()));
+                            },
+                            child: Container(
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: NetworkImage(
+                                          snapshot.data.toString()),
+                                      fit: BoxFit.contain),
+                              ),
+                            ));
+                      }
+                    }),
+                ///Name
+                accountName: StreamBuilder<String>(
+                  stream: Home.nameStreamController.stream,
+                  builder: (context,snap) {
+                    if(!snap.hasData) {
+                      return HeadingText(
+                          text: "",
+                          size: 18,
+                          color: Colors.white,
+                          isUnderline: false);
+                    }else{
+                      return HeadingText(
+                          text: snap.data.toString(),
+                          size: 18,
+                          color: Colors.white,
+                          isUnderline: false);
+                    }
+                  }
                 ),
-                accountName: HeadingText(
-                    text: "",
-                    size: 22,
-                    color: Colors.white,
-                    isUnderline: false),
-                accountEmail: NormalText(
-                    text: "", size: 18, color: Colors.grey.shade400)),
-          if (userImage != null)
-            ///Drawer heading
-            UserAccountsDrawerHeader(
-                //  margin: const EdgeInsets.all(15),
-                decoration: const BoxDecoration(color: Colors.pink),
-                //  currentAccountPictureSize:const Size(80, 80),
-                currentAccountPicture: Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child:
-                   CircleAvatar(
-                    backgroundColor: Colors.white,
-                    backgroundImage: NetworkImage(
-                      userImage!,
-                    ),
-                  ),
-                ),
-                accountName: HeadingText(
-                    text: userName ?? "Not Found",
-                    size: 22,
-                    color: Colors.white,
-                    isUnderline: false),
-                accountEmail: NormalText(
-                    text: userEmail ?? phoneNumber ?? "Not Found",
-                    size: 18,
-                    color: Colors.grey.shade400)),
+                ///Email and phone
+                accountEmail: StreamBuilder<String>(
+                  stream: Home.emailStreamController.stream,
+                  builder: (context,snap) {
+                    if(!snap.hasData){
+                      return StreamBuilder<String>(
+                          stream: Home.phoneStreamController.stream,
+                          builder: (context,snap) {
+                            if(!snap.hasData) {
+                             return NormalText(
+                                  text: "Complete Your Detail", size: 15, color: Colors.grey.shade400);
+                            }else{
+                              return NormalText(
+                                  text: snap.data.toString(), size: 15, color: Colors.grey.shade400);
+                            }
+                          });
+                    }else{
+                      return NormalText(
+                          text: snap.data.toString(), size: 15, color: Colors.grey.shade400);
+                    }
 
-          ///User Detail not Found
-          Visibility(
-              visible: userName != null ? false : true,
-              child: HeadingText(
-                  text: "Complete Your Personal Details",
-                  size: 15,
-                  color: Colors.white,
-                  isUnderline: false)),
+                  }
+                )),
           ListTile(
             leading: Lottie.asset(
               'lib/icons/heart.json',
@@ -431,27 +473,10 @@ class _MyDrawerState extends State<MyDrawer> {
       ),
     );
   }
-  getUserData() async {
-    var userId = FirebaseAuth.instance.currentUser!.uid;
-    var ref = FirebaseDatabase.instance.ref("Users/$userId");
-    final snapshot = await ref.get();
-    if (snapshot.exists) {
-      Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
-      if (mapList['userImage'] != null) {
-        setState(() {});
-        userImage = mapList['userImage'];
-        //adding image to stream controller
-        // streamController.sink.add(userImage.toString());
-      }
-      if (mapList['email'] != null) {
-        userEmail = mapList['email'];
-      }
-      if (mapList['name'] != null) {
-        userName = mapList['name'];
-      }
-      if (mapList['phoneNumber'] != null) {
-        phoneNumber = mapList['phoneNumber'];
-      }
-    }
+  @override
+  void initState() {
+    Home.getUserData();
+    // TODO: implement initState
+    super.initState();
   }
 }

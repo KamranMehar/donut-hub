@@ -16,10 +16,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String? userName;
-  String? userEmail;
-  String? userPhoneNumber;
-  String? userImage;
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +67,18 @@ class _ProfilePageState extends State<ProfilePage> {
                               stream: Home.imageStreamController.stream,
                               builder: (context,snap) {
                                 if(snap.hasData){
-                                  userImage=snap.data;
-                                }
                                 return CircleAvatar(
                                   backgroundColor: Colors.purple,
                                   radius: 50,
-                                  backgroundImage:userImage!=null? NetworkImage(userImage!):const AssetImage('lib/images/user.png') as ImageProvider,
+                                  backgroundImage:NetworkImage(snap.data.toString())
                                 );
+                                }else {
+                                  return const CircleAvatar(
+                                      backgroundColor: Colors.purple,
+                                      radius: 50,
+                                      backgroundImage:AssetImage('lib/images/user.png')
+                                  );
+                                }
                               }
                             ),
                           ),
@@ -85,19 +86,53 @@ class _ProfilePageState extends State<ProfilePage> {
                       ///name
                       Hero(
                           tag: 'name',
-                          child: HeadingText(text: userName??"", color: Colors.black, isUnderline: false,size: 25,)),
+                          child: StreamBuilder(
+                            stream: Home.nameStreamController.stream,
+                            builder: (context,snap) {
+                              if(snap.hasData) {
+                                return HeadingText(text:snap.data.toString(), color: Colors.black,
+                                  isUnderline: false,
+                                  size: 25,);
+                              }else{
+                                return HeadingText(text:"", color: Colors.black,
+                                  isUnderline: false,
+                                  size: 25,);
+                              }
+                            }
+                          )),
                       const SizedBox(height: 5,),
-                      ///email
-                      if(userEmail!=null)
-                      Hero(
-                          tag: 'email',
-                          child: NormalText(text: userEmail??"", color: Colors.grey.shade800,size: 18,)),
+                      ///email or phone
+                      StreamBuilder(
+                          stream: Home.emailStreamController.stream,
+                          builder: (context,snap){
+                            if(snap.hasData){
+                              return Hero(
+                                  tag: 'email',
+                                  child: NormalText(text: snap.data.toString(), color: Colors.grey.shade800,size: 18,));
+                            }else{
+                              return StreamBuilder(
+                                  stream: Home.phoneStreamController.stream,
+                                  builder: (context,snap){
+                                if(snap.hasData){
+                                 return Hero(
+                                    tag: 'phone',
+                                    child: NormalText(text: snap.data.toString(), color: Colors.grey.shade800,size: 18,),
+                                  );
+                                }else{
+                                return  Hero(
+                                    tag: 'phone',
+                                    child: NormalText(text: "", color: Colors.grey.shade800,size: 18,),
+                                  );
+                                }
+                              }
+
+                              );
+                            }
+
+                      })
+                      ,
                       const SizedBox(height: 5,),
-                      if(userPhoneNumber!=null)
-                        Hero(
-                          tag: 'phone',
-                          child: NormalText(text: userPhoneNumber!, color: Colors.grey.shade800,size: 18,),
-                        ),
+
                       ///Edit Profile btn
                       InkWell(
                         onTap: (){
@@ -134,7 +169,7 @@ class _ProfilePageState extends State<ProfilePage> {
     ],);
   }
 
-  getUserData()async{
+ /* getUserData()async{
     var userId=FirebaseAuth.instance.currentUser!.uid;
     DatabaseReference ref=FirebaseDatabase.instance.ref("Users/$userId");
     final snapshot = await ref.get();
@@ -156,11 +191,11 @@ class _ProfilePageState extends State<ProfilePage> {
       });
 
     }
-  }
+  }*/
 
   @override
   void initState() {
-    getUserData();
+    Home.getUserData();
     super.initState();
   }
 }
