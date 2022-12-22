@@ -31,6 +31,21 @@ class Home extends StatefulWidget {
   static StreamController<String> imageStreamController = StreamController<String>.broadcast();
   const Home({Key? key}) : super(key: key);
 
+  static getImage() async {
+    if (FirebaseAuth.instance.currentUser != null) {
+      var userId = FirebaseAuth.instance.currentUser!.uid;
+      var ref = FirebaseDatabase.instance.ref("Users/$userId");
+      final snapshot = await ref.get();
+      if (snapshot.exists) {
+        if (snapshot.value != null) {
+          Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+          if (mapList['userImage'] != null) {
+            Home.imageStreamController.sink.add(mapList['userImage']);
+          }
+        }
+      }
+    }
+  }
   @override
   State<Home> createState() => _HomeState();
 }
@@ -72,11 +87,10 @@ class _HomeState extends State<Home> {
       label: 'Pizza',
     ),
   ];
-  bool refreshPage = false;
-  bool stopTimer = false;
+
   @override
   Widget build(BuildContext context) {
-    Connectivity connectivity = Connectivity();
+
     bool isAdmin = (FirebaseAuth.instance.currentUser!.uid ==
             '9IHNNPnvYZYCgQMJzJswYhVo7pl2') ? true : false;
     return Scaffold(
@@ -110,7 +124,7 @@ class _HomeState extends State<Home> {
                       child: StreamBuilder<String>(
                           stream: Home.imageStreamController.stream,
                           builder: (context, snapshot) {
-                            getImage();
+                            Home.getImage();
                             if (!snapshot.hasData) {
                               return GestureDetector(
                                 onTap: () {
@@ -263,38 +277,24 @@ class _HomeState extends State<Home> {
 
               ///TabView
               Expanded(
-                child: StreamBuilder<ConnectivityResult>(
-                    stream: connectivity.onConnectivityChanged,
-                    builder: (context, snapshot) {
-                      return CheckInternetConnectionWidget(
-                        snapshot: snapshot,
-                        widget: TabBarView(
-                          children: [
-                            // donut page
-                            DonutTab(),
+                child: TabBarView(
+                  children: [
+                    // donut page
+                    DonutTab(),
 
-                            // burger page
-                            BurgerTab(),
+                    // burger page
+                    BurgerTab(),
 
-                            // smoothie page
-                            SmoothieTab(),
+                    // smoothie page
+                    SmoothieTab(),
 
-                            // pancake page
-                            PancakeTab(),
+                    // pancake page
+                    PancakeTab(),
 
-                            // pizza page
-                            PizzaTab(),
-                          ],
-                        ),
-                        changeDefault: refreshPage,
-                        onReTry: () {
-                          // initState();
-                          setState(() {
-                            refreshPage = true;
-                          });
-                        },
-                      );
-                    }),
+                    // pizza page
+                    PizzaTab(),
+                  ],
+                ),
               )
             ],
           ),
@@ -305,10 +305,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    Timer.periodic(const Duration(seconds: 3), (timer) {
-      getImage();
-    });
-
+     Home. getImage();
     ///Lock orientations on Mobile Devices
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android) {
@@ -316,22 +313,6 @@ class _HomeState extends State<Home> {
           [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     }
     super.initState();
-  }
-
-  getImage() async {
-    if (FirebaseAuth.instance.currentUser != null) {
-      var userId = FirebaseAuth.instance.currentUser!.uid;
-      var ref = FirebaseDatabase.instance.ref("Users/$userId");
-      final snapshot = await ref.get();
-      if (snapshot.exists) {
-        if (snapshot.value != null) {
-          Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
-          if (mapList['userImage'] != null) {
-            Home.imageStreamController.sink.add(mapList['userImage']);
-          }
-        }
-      }
-    }
   }
 }
 
@@ -376,7 +357,6 @@ class _MyDrawerState extends State<MyDrawer> {
                 accountEmail: NormalText(
                     text: "", size: 18, color: Colors.grey.shade400)),
           if (userImage != null)
-
             ///Drawer heading
             UserAccountsDrawerHeader(
                 //  margin: const EdgeInsets.all(15),
@@ -385,54 +365,6 @@ class _MyDrawerState extends State<MyDrawer> {
                 currentAccountPicture: Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child:
-                  /*StreamBuilder<String>(
-                      stream: Home.imageStreamController.stream,
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                      const ProfilePage()));
-                            },
-                            child: Container(
-                              height: 60,
-                              width: 60,
-                              decoration:const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(
-                                'lib/images/user.png',
-                                fit: BoxFit.fitHeight,
-                              ),
-                            ),
-                          );
-                        } else {
-                          return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                        const ProfilePage()));
-                              },
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: NetworkImage(
-                                            snapshot.data.toString()),
-                                        fit: BoxFit.contain),),
-                              ));
-                        }
-                      })*/
-
                    CircleAvatar(
                     backgroundColor: Colors.white,
                     backgroundImage: NetworkImage(
@@ -506,6 +438,7 @@ class _MyDrawerState extends State<MyDrawer> {
     if (snapshot.exists) {
       Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
       if (mapList['userImage'] != null) {
+        setState(() {});
         userImage = mapList['userImage'];
         //adding image to stream controller
         // streamController.sink.add(userImage.toString());
@@ -520,6 +453,5 @@ class _MyDrawerState extends State<MyDrawer> {
         phoneNumber = mapList['phoneNumber'];
       }
     }
-    setState(() {});
   }
 }

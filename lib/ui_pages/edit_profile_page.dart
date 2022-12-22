@@ -1,8 +1,6 @@
 import 'dart:core';
 import 'dart:io';
-import 'package:donut_hub/ui_pages/profile.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:donut_hub/ui_pages/home.dart';
 import 'package:donut_hub/util/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -10,8 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:donut_hub/ui_pages/home.dart';
 import '../util/Util.dart';
+import 'home.dart';
 
 String? image;
 String? name;
@@ -274,6 +273,7 @@ class _EditProfileState extends State<EditProfile> {
                               setState(() {
                                 loading = false;
                               });
+                              Home.getImage();
                             }).onError((error, stackTrace) {
                               setState(() {
                                 loading = false;

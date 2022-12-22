@@ -1,14 +1,21 @@
 
-import 'dart:math';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:donut_hub/util/Util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../ui_pages/item_detail.dart';
+import '../util/check_internet_connection_widget.dart';
 import '../util/constents.dart';
 import '../util/donut_tile.dart';
 
-class DonutTab extends StatelessWidget {
+class DonutTab extends StatefulWidget {
 
+  @override
+  State<DonutTab> createState() => _DonutTabState();
+}
+
+class _DonutTabState extends State<DonutTab> {
 DatabaseReference ref=FirebaseDatabase.instance.ref('Items/Donut/');
 
 List<Color> colors=[
@@ -20,9 +27,18 @@ List<Color> colors=[
       Colors.brown
 ];
 
+Connectivity connectivity = Connectivity();
+
+bool refreshPage = false;
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return   StreamBuilder<ConnectivityResult>(
+                stream: connectivity.onConnectivityChanged,
+                builder: (context, snapshot) {
+                  return CheckInternetConnectionWidget(
+                    snapshot: snapshot,
+                    widget: StreamBuilder(
       stream: ref.onValue,
       builder: (BuildContext context, AsyncSnapshot<DatabaseEvent> snapshot) {
         if(!snapshot.hasData){
@@ -43,7 +59,7 @@ List<Color> colors=[
           list.clear();
           if(map!=null) {
             list = map.values.toList();
-            return GridView.builder(
+            return  GridView.builder(
               itemCount: list.length,
               padding: const EdgeInsets.all(12),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -75,7 +91,32 @@ List<Color> colors=[
                         donutColor:colors[index%colors.length],
                         imageName: list[index]['titleImage'],
                         ///Add To Card on Tap method
-                        click: () {})
+                        click: () async {
+                          var orderID=DateTime.now().millisecondsSinceEpoch;
+                          DatabaseReference reference=FirebaseDatabase.instance
+                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderID");
+                                reference.set({
+                                  'name':list[index]['name'],
+                                  'price':list[index]['price'],
+                                  'titleImage':list[index]['titleImage'],
+                                  'coverImage':list[index]['coverImage'],
+                                  'itemType':"Donut",
+                                  'details':list[index]['details'],
+                                  'sugarGram':list[index]['sugarGram'],
+                                  'sugarPercentage':list[index]['sugarPercentage'],
+                                  'saltGram':list[index]['saltGram'],
+                                  'saltPercentage':list[index]['saltPercentage'],
+                                  'fatGram':list[index]['fatGram'],
+                                  'fatPercentage':list[index]['fatPercentage'],
+                                  'energyGram':list[index]['energyGram'],
+                                  'energyPercentage':list[index]['energyPercentage'],
+
+                                }).then((value) {
+                                  Util_.showToast(list[index]['name']+" Added To Cart");
+                                }).onError((error, stackTrace) {
+                                  Util_.showToast(error.toString());
+                                });
+                        })
                 );
               },
             );
@@ -85,6 +126,17 @@ List<Color> colors=[
         }
       },
 
-    );
+    ),changeDefault: refreshPage,
+                    onReTry: () {
+                       setState(() {
+                         if(refreshPage==false){
+                           refreshPage = true;
+                         }else{
+                           refreshPage = false;
+                         }
+                       });
+                    },
+                  );
+                });
   }
 }
