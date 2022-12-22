@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:donut_hub/util/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -326,7 +327,9 @@ class _EditProfileState extends State<EditProfile> {
         }
       });
     } else {
-      print("Data Not Found");
+      if (kDebugMode) {
+        print("Data Not Found");
+      }
     }
   }
 
