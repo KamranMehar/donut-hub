@@ -1,8 +1,10 @@
 
+import 'package:badges/badges.dart';
+import 'package:donut_hub/tab/cart_list.dart';
+import 'package:donut_hub/tab/orders_items.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../util/Util.dart';
 
+import '../util/my_tab.dart';
 class Cart extends StatefulWidget {
   static String id="cart_page";
   const Cart({Key? key}) : super(key: key);
@@ -13,16 +15,31 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
-  
-  List<String>? itemData;
-  
+  List<Widget> myTabs = [
+    // donut tab
+    MyTab(
+      tabHeightSize: 60,
+      imageHeightSize: 25,
+      iconPath: 'lib/icons/list_check.png',
+      label: 'Cart List',
+      fontSize: 10,
+    ),
+    // burger tab
+    MyTab(
+      tabHeightSize: 60,
+      imageHeightSize: 25,
+      iconPath: 'lib/icons/order_icon.png',
+      label: 'Orders',
+      fontSize: 10,
+    ),
+
+  ];
   @override
   Widget build(BuildContext context) {
     return Hero(
       tag: 'cart',
       child: Container(
         decoration: BoxDecoration(
-
           gradient: RadialGradient(colors: [
             Colors.blueGrey.shade100,
             Colors.blueGrey.shade600
@@ -30,67 +47,37 @@ class _CartState extends State<Cart> {
           radius: 1
           ),
         ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
+        child: DefaultTabController(
+          length: myTabs.length,
+          child: Scaffold(
             backgroundColor: Colors.transparent,
-            elevation: 0,
-            automaticallyImplyLeading:true,
-          ),
-          body:itemData==null?const Center(child: CircularProgressIndicator()): ListView.builder(
-          itemCount: itemData?.length,
-              itemBuilder: (context,index){
-            if(itemData==null){
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }else{
-              return Padding(padding: EdgeInsets.all(8),
-              child: Stack(
-                children: [
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Container(
-                    height: 60,
-                    width: MediaQuery.of(context).size.width-50,
-                    decoration:  BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            tileMode: TileMode.mirror,
-                            colors: [
-                              Colors.pink,
-                              Colors.purple,
-                              Colors.deepPurple,
-                            ])
-                    ),
-
-                  ),
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              automaticallyImplyLeading:true,
+            ),
+            body: Column(children: [
+              ///Tab Bar
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TabBar(
+                  tabs: myTabs,
+                  indicator: BoxDecoration(
+                      border: Border.all(color: Colors.pink, width: 2),
+                      borderRadius: BorderRadius.circular(15)),
                 ),
-                 Align(
-                   alignment: Alignment.topLeft,
-                   child: Row(
-                    mainAxisAlignment:MainAxisAlignment.spaceAround,
-                    children: [
-                      SizedBox(
-                        height: 70,
-                        width: 70,
-                        child: Image.asset(itemData![2]),
-                      ),
-                      Text(itemData![0],style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.bold),),
-                      Text(itemData![1]+" \$",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.bold),),
-                      IconButton(onPressed: (){
-                        Util_.deleteFromCart('cart');
-                        itemData?.clear();
-                        setState(() {});
-                      }, icon:const Center(child: Icon(Icons.delete_outline,color: Colors.white,))),
-                    ],),
-                 ),
-
-              ],),);
-            }
-
-          }),
+              ),
+              ///Tab View
+              const Expanded(
+                child: TabBarView(
+                  children: [
+                  CartList(),
+                    Orderitems()
+                  ],
+                ),
+              )
+            ],),
+          ),
         ),
       ),
     );
@@ -98,13 +85,7 @@ class _CartState extends State<Cart> {
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
-   // getData();
-  }
-  
-  getData()async{
-    SharedPreferences pref=await SharedPreferences.getInstance();
-    itemData= pref.getStringList("cart")!;
-    setState(() {});
   }
 }

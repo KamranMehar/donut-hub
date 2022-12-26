@@ -93,9 +93,10 @@ bool refreshPage = false;
                         imageName: list[index]['titleImage'],
                         ///Add To Card on Tap method
                         click: () async {
-                          var orderID=DateTime.now().millisecondsSinceEpoch;
+                        //  var orderID=DateTime.now().millisecondsSinceEpoch;
+                          var orderName=list[index]['name'];
                           DatabaseReference reference=FirebaseDatabase.instance
-                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderID");
+                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderName");
                                 reference.set({
                                   'name':list[index]['name'],
                                   'price':list[index]['price'],
@@ -128,7 +129,8 @@ bool refreshPage = false;
         }
       },
 
-    ),changeDefault: refreshPage,
+    ),
+                    changeDefault: refreshPage,
                     onReTry: () {
                        setState(() {
                          if(refreshPage==false){

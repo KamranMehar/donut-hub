@@ -11,7 +11,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:donut_hub/ui_pages/home.dart';
 import '../util/Util.dart';
-import 'home.dart';
 
 String? image;
 String? name;

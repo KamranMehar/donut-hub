@@ -74,7 +74,8 @@ class _ItemDetailState extends State<ItemDetail> {
                       IconButton(onPressed: (){
                         Navigator.pop(context);
                       }, icon:  const Icon(Icons.arrow_back_ios,color: Colors.white,size: 35)),
-                      Text(widget.name, style: GoogleFonts.oswald(textStyle: const TextStyle(color: Colors.white,fontSize:25,fontWeight:
+                      Text(widget.name, style: GoogleFonts.oswald(textStyle:
+                      const TextStyle(color: Colors.white,fontSize:21,fontWeight:
                       FontWeight.bold,)),),
                       Spacer(),
                       ///Admin checker

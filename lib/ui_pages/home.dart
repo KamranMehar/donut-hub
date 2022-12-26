@@ -96,17 +96,18 @@ class _HomeState extends State<Home> {
     // donut tab
     MyTab(
       iconPath: 'lib/icons/donut.png',
-      label: 'Donut',
+      label: 'Donut', fontSize: 10,
     ),
 
     // burger tab
     MyTab(
       iconPath: 'lib/icons/burger.png',
-      label: 'Burger',
+      label: 'Burger', fontSize: 10,
     ),
 
     // smoothie tab
     MyTab(
+      fontSize: 10,
       iconPath: 'lib/icons/smoothie.png',
       label: 'Smoothie',
     ),
@@ -114,11 +115,12 @@ class _HomeState extends State<Home> {
     // pancake tab
     MyTab(
       iconPath: 'lib/icons/pancakes.png',
-      label: 'PanCakes',
+      label: 'PanCakes', fontSize: 10,
     ),
 
     // pizza tab
     MyTab(
+      fontSize: 10,
       iconPath: 'lib/icons/pizza.png',
       label: 'Pizza',
     ),

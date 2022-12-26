@@ -11,7 +11,7 @@ class HeadingText extends StatelessWidget {
   required this.text,
    required this.color,
      this.size=25,
-    required this.isUnderline,
+     this.isUnderline=false,
    }) : super(key: key);
 
   @override
