@@ -79,7 +79,6 @@ class _CartState extends State<Cart> {
                             int quantity=list[i]['quantity'];
                             int price=int.parse(list[i]['price']);
                             totalPrice=totalPrice+(quantity*price);
-                           // totalPrice=totalPrice+int.parse(list[i]['price']);
                           }
                           addTotalToStream(totalPrice);
 
@@ -107,9 +106,6 @@ class _CartState extends State<Cart> {
                                     });
                                   },
                                   incrementPriceCallBack: (int v) {
-                                 /*   totalPrice = totalPrice+(v * int.parse(list[index]['price']));
-                                    print(totalPrice);
-                                    addTotalToStream(totalPrice);*/
                                     FirebaseDatabase.instance
                                         .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/"+list[index]['name']).update({
                                       'quantity': v,
@@ -118,9 +114,7 @@ class _CartState extends State<Cart> {
                                   }
                                   ,
                                   decrementPriceCallback: (int v) {
-                                    /*totalPrice = totalPrice -(v * int.parse(list[index]['price']));
-                                    print(totalPrice);
-                                    addTotalToStream(totalPrice);*/
+
                                     FirebaseDatabase.instance
                                         .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/"+list[index]['name']).update({
                                       'quantity': v,
