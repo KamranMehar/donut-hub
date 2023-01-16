@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:badges/badges.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
 import 'package:donut_hub/ui_pages/profile.dart';
@@ -38,23 +36,21 @@ class Home extends StatefulWidget {
   static StreamController<String> nameStreamController = StreamController<String>.broadcast();
   static StreamController<int> cartBadgeStreamCn = StreamController<int>.broadcast();
   const Home({Key? key}) : super(key: key);
-static setStateHome(){
 
-}
   static updateCartBadge()async{
-  DatabaseReference ref=FirebaseDatabase.instance
-      .ref("Users/"+FirebaseAuth.instance.currentUser!.uid+"/Cart");
-  final snapshot = await ref.get();
-  if(snapshot.exists){
-    Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+    DatabaseReference ref=FirebaseDatabase.instance
+        .ref("Users/"+FirebaseAuth.instance.currentUser!.uid+"/Cart");
+    final snapshot = await ref.get();
+    if(snapshot.exists){
+      Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
 
-    if(mapList!=null){
-      showCartBadge=true;
-      cartBadgeStreamCn.sink.add(mapList.length);
-    }else{
-      showCartBadge=false;
+      if(mapList!=null){
+        showCartBadge=true;
+        cartBadgeStreamCn.sink.add(mapList.length);
+      }else{
+        showCartBadge=false;
+      }
     }
-  }
 
   }
   static getUserData() async {
@@ -127,7 +123,6 @@ class _HomeState extends State<Home> {
   ];
   @override
   Widget build(BuildContext context) {
-
     bool isAdmin = (FirebaseAuth.instance.currentUser!.uid ==
             '9IHNNPnvYZYCgQMJzJswYhVo7pl2') ? true : false;
     return Scaffold(
@@ -269,7 +264,9 @@ class _HomeState extends State<Home> {
           floatingActionButton: isAdmin
               ? FloatingActionButton(
                   heroTag: 'addItem',
-                  onPressed: () {
+                  onPressed: ()async {
+
+
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => AddItem()));
                   },
@@ -328,6 +325,7 @@ class _HomeState extends State<Home> {
               ///TabView
               Expanded(
                 child: TabBarView(
+                  physics:const BouncingScrollPhysics(),
                   children: [
                     // donut page
                     DonutTab(),
@@ -355,7 +353,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    Timer.periodic(Duration(seconds: 5), (timer) {Home.updateCartBadge(); });
+  // Timer.periodic(const Duration(seconds: 3), (timer) {Home.updateCartBadge(); });
      Home. getUserData();
     ///Lock orientations on Mobile Devices
     if (defaultTargetPlatform == TargetPlatform.iOS ||
@@ -513,6 +511,7 @@ class _MyDrawerState extends State<MyDrawer> {
   @override
   void initState() {
     Home.getUserData();
+    Home.updateCartBadge();
     // TODO: implement initState
     super.initState();
   }

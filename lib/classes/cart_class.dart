@@ -1,4 +1,3 @@
-
 class CartItem{
   String name;
   String price;
@@ -6,32 +5,40 @@ class CartItem{
   String coverImage;
   String itemType;
   String details;
-
-  int sugarGram;
-  int sugarPercentage;
-  int saltGram;
-  int saltPercentage;
-  int fateGram;
-  int fatPercentage;
-  int energyGrams;
-  int energyPercentage;
+  int id;
+  int quantity;
 
   CartItem({
-  required this.name,
-  required this.price,
+    required this.name,
+    required this.price,
     required this.titleImage,
     required this.coverImage,
     required this.itemType,
     required this.details,
-
-    this.sugarGram=0,
-    this. sugarPercentage=0,
-    this. saltGram=0,
-    this. saltPercentage=0,
-    this. fateGram=0,
-    this. fatPercentage=0,
-    this. energyGrams=0,
-    this. energyPercentage=0,
+    required this.id,
+    required this.quantity,
   });
 
+  CartItem.fromMap(Map<String,dynamic> res):
+        name=res['name'],
+        price=res['price'],
+        titleImage=res['titleImage'],
+        coverImage=res['coverImage'],
+        itemType=res['itemType'],
+        details=res['details'],
+        id=res['id'],
+        quantity=res['quantity'];
+
+  Map<String,Object?> toMap(){
+    return {
+      'name':name,
+      'price':price,
+      'titleImage':titleImage,
+      'coverImage':coverImage,
+      'itemType':coverImage,
+      'details':details,
+      'id':id,
+      'quantity':quantity,
+    };
+  }
 }

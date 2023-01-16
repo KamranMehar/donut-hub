@@ -32,6 +32,7 @@ Connectivity connectivity = Connectivity();
 
 bool refreshPage = false;
 
+
   @override
   Widget build(BuildContext context) {
     return   StreamBuilder<ConnectivityResult>(
@@ -92,34 +93,24 @@ bool refreshPage = false;
                         donutColor:colors[index%colors.length],
                         imageName: list[index]['titleImage'],
                         ///Add To Card on Tap method
-                        click: () async {
-                        //  var orderID=DateTime.now().millisecondsSinceEpoch;
+                        addToCart: () async {
                           var orderName=list[index]['name'];
                           DatabaseReference reference=FirebaseDatabase.instance
                               .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderName");
-                                reference.set({
-                                  'name':list[index]['name'],
-                                  'price':list[index]['price'],
-                                  'titleImage':list[index]['titleImage'],
-                                  'coverImage':list[index]['coverImage'],
-                                  'itemType':"Donut",
-                                  'details':list[index]['details'],
-                                  'sugarGram':list[index]['sugarGram'],
-                                  'sugarPercentage':list[index]['sugarPercentage'],
-                                  'saltGram':list[index]['saltGram'],
-                                  'saltPercentage':list[index]['saltPercentage'],
-                                  'fatGram':list[index]['fatGram'],
-                                  'fatPercentage':list[index]['fatPercentage'],
-                                  'energyGram':list[index]['energyGram'],
-                                  'energyPercentage':list[index]['energyPercentage'],
-
-                                }).then((value) {
-                                  Home.updateCartBadge();
-                                  Util_.showToast(list[index]['name']+" Added To Cart");
-                                }).onError((error, stackTrace) {
-                                  Util_.showToast(error.toString());
-                                });
-                        })
+                          reference.set({
+                            'name':list[index]['name'],
+                            'price':list[index]['price'],
+                            'titleImage':list[index]['titleImage'],
+                            'coverImage':list[index]['coverImage'],
+                            'itemType':"Donut",
+                            'quantity':1,
+                          }).then((value) {
+                            Home.updateCartBadge();
+                            Util_.showToast(list[index]['name']+" Added To Cart");
+                          }).onError((error, stackTrace) {
+                            Util_.showToast(error.toString());
+                          });
+                        }, addToFav: () {  },)
                 );
               },
             );
@@ -142,5 +133,11 @@ bool refreshPage = false;
                     },
                   );
                 });
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Home.updateCartBadge();
   }
 }

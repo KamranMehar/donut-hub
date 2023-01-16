@@ -18,11 +18,14 @@ class VerifyCode extends StatefulWidget {
   State<VerifyCode> createState() => _VerifyCodeState();
 }
 
-class _VerifyCodeState extends State<VerifyCode> {
+class _VerifyCodeState extends State<VerifyCode>{
   final auth=FirebaseAuth.instance;
   final codeController=TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool loading=false;
+
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -61,12 +64,13 @@ class _VerifyCodeState extends State<VerifyCode> {
             ),
             const SizedBox(height: 50,),
             ///TextFormField
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
               Form(
                 key: _formKey,
                 child: Container(
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.3),
                       border: Border.all(color: Colors.pink,width: 1),
@@ -95,9 +99,10 @@ class _VerifyCodeState extends State<VerifyCode> {
                 ),
               ),
             ],),
-            const SizedBox(height: 50,),
+            //const SizedBox(height: 20,),
+           const Spacer(),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal:10),
+              padding: const EdgeInsets.symmetric(horizontal:20,vertical: 60),
               child: CustomButton(
                 isLoading: loading,
                  text: "Verify",

@@ -1,7 +1,10 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import '../ui_pages/home.dart';
 import '../ui_pages/item_detail.dart';
+import '../util/Util.dart';
 import '../util/check_internet_connection_widget.dart';
 import '../util/constents.dart';
 import '../util/donut_tile.dart';
@@ -33,7 +36,7 @@ class _BurgerTabState extends State<BurgerTab> {
 
   @override
   Widget build(BuildContext context) {
-    return   StreamBuilder<ConnectivityResult>(
+    return  StreamBuilder<ConnectivityResult>(
         stream: connectivity.onConnectivityChanged,
         builder: (context, snapshot) {
           return CheckInternetConnectionWidget(
@@ -85,13 +88,30 @@ class _BurgerTabState extends State<BurgerTab> {
                                         energyPercentage: list[index]['energyPercentage'],
                                         ref: "Items/Donut/"+list[index]['name'],)));
                             },
-                            child: DonutTile(
-                                donutFlavor: list[index]['name'],
-                                donutPrice: list[index]['price'],
-                                donutColor:colors[index%colors.length],
-                                imageName: list[index]['titleImage'],
-                                ///Add To Card on Tap method
-                                click: () {})
+                            child:DonutTile(
+                              donutFlavor: list[index]['name'],
+                              donutPrice: list[index]['price'],
+                              donutColor:colors[index%colors.length],
+                              imageName: list[index]['titleImage'],
+                              ///Add To Card on Tap method
+                              addToCart: () async {
+                                var orderName=list[index]['name'];
+                                DatabaseReference reference=FirebaseDatabase.instance
+                                    .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderName");
+                                reference.set({
+                                  'name':list[index]['name'],
+                                  'price':list[index]['price'],
+                                  'titleImage':list[index]['titleImage'],
+                                  'coverImage':list[index]['coverImage'],
+                                  'itemType':"Burger",
+                                  'quantity':1,
+                                }).then((value) {
+                                  Home.updateCartBadge();
+                                  Util_.showToast(list[index]['name']+" Added To Cart");
+                                }).onError((error, stackTrace) {
+                                  Util_.showToast(error.toString());
+                                });
+                              }, addToFav: () {  },)
                         );
                       },
                     );
@@ -101,7 +121,8 @@ class _BurgerTabState extends State<BurgerTab> {
                 }
               },
 
-            ),changeDefault: refreshPage,
+            ),
+            changeDefault: refreshPage,
             onReTry: () {
               setState(() {
                 if(refreshPage==false){

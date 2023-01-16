@@ -1,3 +1,4 @@
+
 import 'package:donut_hub/authentication%20pages/login_page.dart';
 import 'package:donut_hub/ui_pages/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,7 +21,7 @@ Future<void> main() async{
   if(FirebaseAuth.instance.currentUser==null && pref.getBool("isLogin")==null){
     isLogin=false;
   }
-  runApp(const MyApp());
+  runApp( const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -40,13 +41,13 @@ class MyApp extends StatelessWidget {
       ///Generally set the them data _StatusBar Color etc
       theme: ThemeData(
         appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            //for Android devices
-            statusBarIconBrightness: Brightness.dark,
-            //for IOS Devices
-            statusBarBrightness: Brightness.light
-          )
+            systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                //for Android devices
+                statusBarIconBrightness: Brightness.dark,
+                //for IOS Devices
+                statusBarBrightness: Brightness.light
+            )
         ),
         primarySwatch: Colors.pink,
       ),

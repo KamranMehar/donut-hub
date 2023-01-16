@@ -4,11 +4,14 @@ import 'constents.dart';
 import 'custom_button.dart';
 
 class CartItemTile extends StatefulWidget {
+  int quantity;
   String coverImage;
   String titleImage;
   String name;
   String price;
   VoidCallback onCancelClick;
+  Function(int) incrementPriceCallBack;
+  Function(int) decrementPriceCallback;
 
   bool isLoading=false;
    CartItemTile({Key? key,
@@ -16,8 +19,10 @@ class CartItemTile extends StatefulWidget {
     required this.price,
     required this.titleImage,
     required this.coverImage,
+     required this.quantity,
     required this.onCancelClick,
-     required
+  required this.incrementPriceCallBack,
+     required this.decrementPriceCallback,
   }) : super(key: key);
 
   @override
@@ -37,7 +42,7 @@ class _CartItemTileState extends State<CartItemTile> {
             height: 350,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(image: NetworkImage(widget.coverImage),
                     fit: BoxFit.fill),
             ),
@@ -84,12 +89,15 @@ class _CartItemTileState extends State<CartItemTile> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                  //-
+                  ///-
                   GestureDetector(
                     onTap: (){
+
                       setState(() {
                         if(counter!=1){
                           counter--;
+                          widget.decrementPriceCallback(counter);
+                          setState(() {});
                         }
                       });
                     },
@@ -104,13 +112,15 @@ class _CartItemTileState extends State<CartItemTile> {
                   BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10)),
-                    child: Center(child: NormalText(text: counter.toString(), color: Colors.black)),),
-                  //+
+                    child: Center(child: NormalText(text: widget.quantity.toString(), color: Colors.black)),),
+                  ///+
                   GestureDetector(
                     onTap: (){
                       setState(() {
                         if(counter<99){
                           counter++;
+                          widget.incrementPriceCallBack(counter);
+                          setState(() {});
                         }
                       });
                     },

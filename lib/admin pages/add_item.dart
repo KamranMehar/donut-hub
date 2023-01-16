@@ -419,7 +419,7 @@ class _AddItemState extends State<AddItem> {
                                 'fatGram':item.fateGram,
                                 'fatPercentage':item.fatPercentage,
                                 'energyGram':item.energyGrams,
-                                'energyPercentage':item.energyPercentage
+                                'energyPercentage':item.energyPercentage,
                               }).then((value) {
                                 Util_.showToast("${item.name} Added Successfully");
                                 setState(() {

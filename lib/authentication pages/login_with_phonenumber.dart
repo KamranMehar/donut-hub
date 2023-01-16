@@ -108,7 +108,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone> {
                    ),
                  ],
                )),
-              const Spacer(flex: 1,),
+              const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal:10),
                 child: CustomButton(

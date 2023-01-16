@@ -7,14 +7,18 @@ class DonutTile extends StatelessWidget {
   final donutColor;
   final String imageName;
   final double borderRadius = 12;
-  VoidCallback click;
+  Color favColor;
+  VoidCallback addToCart;
+  VoidCallback addToFav;
     DonutTile({
     super.key,
     required this.donutFlavor,
     required this.donutPrice,
     required this.donutColor,
     required this.imageName,
-     required this.click
+     required this.addToCart,
+      required this.addToFav,
+      this.favColor=Colors.grey,
   });
 
 
@@ -96,19 +100,10 @@ class DonutTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // love icon
-                  Icon(
-                    Icons.favorite,
-                    color: Colors.pink[400],
-                  ),
+                  IconButton(onPressed: addToFav, icon: Icon(Icons.favorite,color: favColor,)),
 
                   // plus button
-                  InkWell(
-                    onTap: click,
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.grey[800],
-                    ),
-                  ),
+                 IconButton(onPressed: addToCart, icon: const Icon(Icons.check,color: Colors.grey,))
                 ],
               ),
             )
