@@ -53,6 +53,7 @@ dependencies:
   image_picker: ^0.8.6
   connectivity_plus: ^3.0.2
   badges: ^2.0.2
+  glassmorphism: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -69,14 +70,14 @@ dev_dependencies:
 flutter_native_splash:
     color: "#ffffff"
     image: lib/images/chocolate_donut.png
-    color_dark: "#121212"
+    color_dark: "#ffffff"
     image_dark: lib/images/chocolate_donut.png
 
     android_12:
       image: lib/images/chocolate_donut.png
       icon_background_color: "#ffffff"
       image_dark: lib/images/chocolate_donut.png
-      icon_background_color_dark: "#121212"
+      icon_background_color_dark: "#ffffff"
 
     web: false
 

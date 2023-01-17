@@ -177,7 +177,7 @@ class _CartState extends State<Cart> {
                         ),
                         child: TextButton(onPressed: () {
                           if(totalPrice!=0){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> OrderConfirmationScreen()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> OrderConfirmationScreen(totalAmount: totalPrice,)));
                           }else{
                             Util_.showToast("Cart is Empty !");
                           }
