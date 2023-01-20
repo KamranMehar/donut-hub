@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:donut_hub/classes/cart_class.dart';
 import 'package:donut_hub/ui_pages/home.dart';
 import 'package:donut_hub/ui_pages/order_confirmation_page.dart';
+import 'package:donut_hub/ui_pages/pending_order_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../util/Util.dart';
 import '../util/cart_item.dart';
 import '../util/constents.dart';
@@ -29,8 +31,8 @@ class _CartState extends State<Cart> {
 
   @override
   Widget build(BuildContext context) {
-    var ref=FirebaseDatabase.instance
-        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart").onValue.asBroadcastStream();
+   /* var ref=FirebaseDatabase.instance
+        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart").onValue.asBroadcastStream();*/
     return Hero(
       tag: 'cart',
       child: Container(
@@ -211,8 +213,19 @@ addTotalItemsToStream(int num)async{
    cartDataStreamController.sink.add(event);
 }
 
+checkPendingOrder()async{
+  SharedPreferences pref = await SharedPreferences.getInstance();
+ bool? isOrderPending=  pref.getBool("pendingOrder");
+ if(isOrderPending==false || isOrderPending==null){
+
+ }else{
+   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>PendingOrderScreen() ));
+ }
+}
+
 @override
   void initState() {
+    checkPendingOrder();
     Timer.periodic(const Duration(seconds: 3), (timer) {
       getCartData();
     });
@@ -227,82 +240,3 @@ addTotalItemsToStream(int num)async{
   }
 
 }
-
-/*StreamBuilder(
-                stream: ref,
-                builder: (context,AsyncSnapshot<DatabaseEvent> snapshot) {
-
-                    if (snapshot.data != null) {
-                      Map<dynamic, dynamic> ?map = snapshot.data!.snapshot
-                          .value as dynamic;
-                      List<dynamic> list = [];
-                      list.clear();
-
-                      if (map != null) {
-                        list = map.values.toList();
-
-                        //adding total item numbers to item stream
-                        addTotalItemsToStream(list.length);
-
-                        //adding sum of total items prices to total price stream
-                        totalPrice=0;
-                          for(int i=0;i<list.length;i++){
-                            int quantity=list[i]['quantity'];
-                            int price=int.parse(list[i]['price']);
-                            totalPrice=totalPrice+(quantity*price);
-                          }
-                          addTotalToStream(totalPrice);
-
-                        return ListView.builder(
-                            physics:const BouncingScrollPhysics(),
-                            itemCount: list.length,
-                            itemBuilder: (context, index) {
-                              return CartItemTile(
-                                  name: list[index]['name'],
-                                  price: list[index]['price'],
-                                  titleImage: list[index]['titleImage'],
-                                  coverImage: list[index]['coverImage'],
-                                  quantity: list[index]['quantity'],
-                                  onCancelClick: () async {
-                                    ///Delete from cart list
-                                    DatabaseReference ref = FirebaseDatabase
-                                        .instance
-                                        .ref("Users/" +
-                                        FirebaseAuth.instance.currentUser!.uid +
-                                        "/Cart/" + list[index]['name']);
-                                    ref.remove().then((value) {
-                                      Util_.showToast(list[index]['name'] +
-                                          " Removed from cart");
-                                      Home.updateCartBadge();
-                                    });
-                                  },
-                                  incrementPriceCallBack: (int v) {
-                                    FirebaseDatabase.instance
-                                        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/"+list[index]['name']).update({
-                                      'quantity': v,
-                                    }).onError((error, stackTrace) => print(error.toString()));
-
-                                  }
-                                  ,
-                                  decrementPriceCallback: (int v) {
-
-                                    FirebaseDatabase.instance
-                                        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/"+list[index]['name']).update({
-                                      'quantity': v,
-                                    }).onError((error, stackTrace) => print(error.toString()));
-                                  });
-                            });
-                      } else {
-                        return const Center(child: Text("NO RECORD"),);
-                      }
-                    } else {
-                      //setState(() {});
-                      return  Center(child: TextButton(
-                          onPressed: (){
-                            setState(() {});
-                          }, child:const Text("Refresh",
-                        style: TextStyle(fontSize: 21,color: Colors.black,fontWeight: FontWeight.bold),)),);
-                    }
-
-                }
-                ),*/

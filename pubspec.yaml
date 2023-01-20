@@ -53,7 +53,12 @@ dependencies:
   image_picker: ^0.8.6
   connectivity_plus: ^3.0.2
   badges: ^2.0.2
-  glassmorphism: ^3.0.0
+  geolocator: any
+  geocoding: any
+  carousel_slider: ^4.2.1
+  provider: any
+  firebase_messaging: any
+  flutter_local_notifications: ^9.2.0
 
 dev_dependencies:
   flutter_test:

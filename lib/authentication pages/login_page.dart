@@ -162,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: (){
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => Sign_up()));
                   },
-                  child: Padding(padding: EdgeInsets.all(0.8),
+                  child: Padding(padding: const EdgeInsets.all(0.8),
                     child:  Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
