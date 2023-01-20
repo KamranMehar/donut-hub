@@ -17,9 +17,9 @@ class Util_ {
 
 
 
- static showErrorDialog(BuildContext context,message){
+ static showErrorDialog(BuildContext context,message,){
    QuickAlert.show(
-     customAsset: 'lib/images/donuts/purple_donut.gif',
+     customAsset: 'lib/images/donuts/strawbery_donut_gif.gif',
        context: context,
        type: QuickAlertType.error,
        title: 'Oops...',

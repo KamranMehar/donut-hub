@@ -12,8 +12,6 @@ class CartItemTile extends StatefulWidget {
   VoidCallback onCancelClick;
   Function(int) incrementPriceCallBack;
   Function(int) decrementPriceCallback;
-
-  bool isLoading=false;
    CartItemTile({Key? key,
   required this.name,
     required this.price,
@@ -52,11 +50,11 @@ class _CartItemTileState extends State<CartItemTile> {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              gradient: const LinearGradient(
+              gradient:  LinearGradient(
                   colors: [
                     Colors.transparent,
-                    Colors.black54,
-                    Colors.black,
+                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.7),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter
@@ -86,58 +84,55 @@ class _CartItemTileState extends State<CartItemTile> {
                 ///Name
                 HeadingText(text: widget.name, color: Colors.white,),
                 NormalText(text: "Price: ${widget.price}\$", color: Colors.white),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                  ///-
-                  GestureDetector(
-                    onTap: (){
-
-                      setState(() {
-                        if(counter!=1){
-                          counter--;
-                          widget.decrementPriceCallback(counter);
-                          setState(() {});
-                        }
-                      });
-                    },
-                    child: Container(height: 40,width: 40,decoration:
-                    BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(child: NormalText(text: "-", color: Colors.black)),),
-                  ),
-                  //counter
-                  Container(height: 40,width: 40,decoration:
-                  BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                    child: Center(child: NormalText(text: widget.quantity.toString(), color: Colors.black)),),
-                  ///+
-                  GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        if(counter<99){
-                          counter++;
-                          widget.incrementPriceCallBack(counter);
-                          setState(() {});
-                        }
-                      });
-                    },
-                    child: Container(height: 40,width: 40,decoration:
-                    BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(child: NormalText(text: "+", color: Colors.black)),),
-                  )
-                ],),
-                ///buy button
                 Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: CustomButton(text: "Buy", click: (){
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                    ///-
+                    GestureDetector(
+                      onTap: (){
 
-                  },isLoading: widget.isLoading,),
+                        setState(() {
+                          if(counter!=1){
+                            counter--;
+                            widget.decrementPriceCallback(counter);
+                            setState(() {});
+                          }
+                        });
+                      },
+                      child: Container(height: 40,width: 40,decoration:
+                      BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Center(child: NormalText(text: "-", color: Colors.black,)),),
+                    ),
+                    //counter
+                    Container(height: 40,width: 40,decoration:
+                    BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                      child: Center(child: NormalText(text: widget.quantity.toString(), color: Colors.black)),),
+                    ///+
+                    GestureDetector(
+                      onTap: (){
+                        setState(() {
+                          if(counter<99){
+                            counter++;
+                            widget.incrementPriceCallBack(counter);
+                            setState(() {});
+                          }
+                        });
+                      },
+                      child: Container(height: 40,width: 40,decoration:
+                      BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Center(child: NormalText(text: "+", color: Colors.black)),),
+                    )
+                  ],),
                 ),
+
               ],),
           )
         ],
