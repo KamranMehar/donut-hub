@@ -374,7 +374,7 @@ class _HomeState extends State<Home> {
            if (message.data['_id'] != null) {
              Navigator.of(context).push(
                MaterialPageRoute(
-                 builder: (context) => Cart(),
+                 builder: (context) =>const Cart(),
                ),
              );
            }
