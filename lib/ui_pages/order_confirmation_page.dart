@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:donut_hub/provider/credit_card_selection_provider.dart';
+import 'package:donut_hub/ui_pages/home.dart';
 import 'package:donut_hub/ui_pages/pending_order_screen.dart';
 import 'package:donut_hub/util/Util.dart';
 import 'package:donut_hub/util/constents.dart';
@@ -564,7 +565,11 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                     isLoading: isLoading,
                     click: () async {
                       if (_formKey.currentState!.validate()) {
-                        setState(() {
+
+                        Home.sendNotificationToTopic("Kamran", "Hello there !",
+                        "ff6g-gopTR2ZT_vaMqLxm3:APA91bF3fFl9l2OJXZpqoCYrPwPuxwoSUFRriHDIE_V4BnX9tcEQsLnhXUIebK56VLdsjzrwCr-s1fUmtxwEJItUbLpoY4d6PKx271hWN8qRvcv8VfJIuVTkI7tjPS5OOdH2r142NV8f");
+
+                        /*setState(() {
                           isLoading = true;
                         });
 
@@ -580,7 +585,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                           setState(() {
                             isLoading = false;
                           });
-                        });
+                        });*/
                       }
                     }),
               )

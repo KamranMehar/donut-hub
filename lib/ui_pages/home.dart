@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:badges/badges.dart';
 import 'package:donut_hub/admin%20pages/add_item.dart';
@@ -22,10 +23,10 @@ import '../tab/donut_tab.dart';
 import '../tab/pancake_tab.dart';
 import '../tab/pizza_tab.dart';
 import '../tab/smoothie_tab.dart';
-import '../util/check_internet_connection_widget.dart';
 import '../util/constents.dart';
 import '../util/my_tab.dart';
 import 'cart.dart';
+import 'package:http/http.dart' as http;
 
 
 class Home extends StatefulWidget {
@@ -53,7 +54,6 @@ class Home extends StatefulWidget {
         showCartBadge=false;
       }
     }
-
   }
   static getUserData() async {
     if (FirebaseAuth.instance.currentUser != null) {
@@ -79,7 +79,39 @@ class Home extends StatefulWidget {
       }
     }
   }
+  static sendNotificationToTopic(String title,String body,String token)async{
 
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'message': title,
+    };
+    try{
+      http.Response response = await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),headers: <String,String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'key=AAAAlAoZifQ:APA91bEAR6QRAVDdWDAHd8zw-GysRWteD3LvdOT7mPvQfqqHtnopFH3Gb8mPlygO6VA-4rwwBepQFZRGbPY4XekUVP7ZSog2qPDlEJ1bhDWX22Zl_agQri8A1an5lVePFhpL2MQR-t4V'
+      },
+          body: jsonEncode(<String,dynamic>{
+            'notification': <String,dynamic> {'title': title,'body': body},
+            'priority': 'high',
+            'data': data,
+            'to': '$token'
+          })
+      );
+      if(response.statusCode == 200){
+        if (kDebugMode) {
+          print("Yeh Notification is sent");
+        }
+      }else{
+        print("Error");
+      }
+    }catch(e){
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
   @override
   State<Home> createState() => _HomeState();
 }
@@ -267,9 +299,7 @@ class _HomeState extends State<Home> {
               ? FloatingActionButton(
                   heroTag: 'addItem',
                   onPressed: ()async {
-
-
-                    Navigator.push(context,
+                  Navigator.push(context,
                         MaterialPageRoute(builder: (context) => AddItem()));
                   },
                   child: const Icon(
@@ -352,11 +382,31 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+  storeNotificationToken()async{
+    String? token = await FirebaseMessaging.instance.getToken();
+    DatabaseReference ref=FirebaseDatabase.instance
+        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}");
+    final snapshot = await ref.get();
+    if(snapshot.exists){
+      if(token!=null){
+      Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+        if(mapList['token']==null || mapList['token']!=token){
+          ref.update({
+            'token':token
+          }).onError((error, stackTrace){
+            if (kDebugMode) {
+              print(error.toString());
+            }
+          });
+        }
+      }
+    }
+  }
 
   @override
   void initState() {
-  // Timer.periodic(const Duration(seconds: 3), (timer) {Home.updateCartBadge(); });
      Home. getUserData();
+     storeNotificationToken();
     ///Lock orientations on Mobile Devices
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android) {

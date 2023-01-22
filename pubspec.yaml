@@ -59,6 +59,7 @@ dependencies:
   provider: any
   firebase_messaging: any
   flutter_local_notifications: ^9.2.0
+  http:
 
 dev_dependencies:
   flutter_test:
