@@ -1,4 +1,6 @@
 
+
+import 'package:donut_hub/admin%20pages/orders_screen.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
 import 'package:donut_hub/notification_service/local_notification_service.dart';
 import 'package:donut_hub/provider/credit_card_selection_provider.dart';
@@ -16,6 +18,7 @@ Future<void> backgroundHandler(RemoteMessage message)async{
   print(message.notification!.title);
 }
 bool? isLogin;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences pref = await SharedPreferences.getInstance();
@@ -49,8 +52,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         initialRoute: isLogin==false ? "first" : "/",
         routes: {
-          '/': (context)=>const Home(),
+          '/': (context)=> Home(),
           'first': (context)=>const LoginPage(),
+          OrdersScreen.id: (context)=>OrdersScreen(),
         },
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
@@ -67,6 +71,7 @@ class MyApp extends StatelessWidget {
           ),
           primarySwatch: Colors.pink,
         ),
+        navigatorKey: navigatorKey,
       ),
     );
   }

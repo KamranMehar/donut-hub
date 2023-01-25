@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,8 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   TextEditingController addressController = TextEditingController();
   TextEditingController pinController = TextEditingController();
   TextEditingController cardNumberController = TextEditingController();
+  String adminDeviceToken="";
+
 
   List<String> cards=["Visa Card","Master Card"];
 
@@ -130,7 +133,6 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    print("build");
     final _formKey = GlobalKey<FormState>();
     return Container(
       decoration: const BoxDecoration(
@@ -141,6 +143,12 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
       ),
       child: Scaffold(
         appBar: AppBar(
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            //changing the colors of status bar icons to white (light) /for Android
+              statusBarIconBrightness: Brightness.light,
+              //changing the colors of status bar icons to white (light) /for IOS
+              statusBarBrightness: Brightness.light
+          ),
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
           title: HeadingText(text: "Confirmation", color: Colors.white),
@@ -565,15 +573,19 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                     isLoading: isLoading,
                     click: () async {
                       if (_formKey.currentState!.validate()) {
-
-                        Home.sendNotificationToTopic("Kamran", "Hello there !",
-                        "ff6g-gopTR2ZT_vaMqLxm3:APA91bF3fFl9l2OJXZpqoCYrPwPuxwoSUFRriHDIE_V4BnX9tcEQsLnhXUIebK56VLdsjzrwCr-s1fUmtxwEJItUbLpoY4d6PKx271hWN8qRvcv8VfJIuVTkI7tjPS5OOdH2r142NV8f");
-
-                        /*setState(() {
+                        Home.sendNotificationToTopic("New Order Placed by ${name}", "Address: \n${addressController.text}",
+                        adminDeviceToken,10);
+                        setState(() {
                           isLoading = true;
                         });
-
-                        ///set Locally pending order shared preferences to show pending order screen
+                        var userId=FirebaseAuth.instance.currentUser!.uid;
+                        FirebaseDatabase.instance.ref("Admin/Pending Orders/"
+                            "${userId}/").set({
+                            'userId':userId,
+                            'address':addressController.text,
+                            'totalPrice': widget.totalAmount
+                        }).then((value){
+                          /* ///set Locally pending order shared preferences to show pending order screen
                         SharedPreferences pref =
                         await SharedPreferences.getInstance();
                         pref.setBool("pendingOrder", true).then((value) {
@@ -586,6 +598,16 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                             isLoading = false;
                           });
                         });*/
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }).onError((error, stackTrace){
+                          setState(() {
+                            isLoading = false;
+                          });
+                          Util_.showErrorDialog(context, error.toString());
+                        });
+
                       }
                     }),
               )
@@ -595,9 +617,20 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
       ),
     );
   }
+
+   getAdminToken()async{
+    String result;
+   await FirebaseDatabase.instance.ref("Admin/adminToken").once().then((value){
+     result=value.snapshot.value.toString();
+     adminDeviceToken=result;
+   });
+
+  }
+
   @override
   void initState() {
     getUserName();
+    getAdminToken();
     // TODO: implement initState
     super.initState();
   }

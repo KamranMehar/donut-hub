@@ -1,6 +1,9 @@
 
+import 'package:donut_hub/admin%20pages/orders_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import '../main.dart';
 
 class LocalNotificationService{
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -18,8 +21,8 @@ class LocalNotificationService{
       onSelectNotification: (String? id) async {
         print("onSelectNotification");
         if (id!.isNotEmpty) {
-          print("Router Value1234 $id");
-
+          print("Router  $id");
+          navigatorKey.currentState!.pushNamed(OrdersScreen.id);
           // Navigator.of(context).push(
           //   MaterialPageRoute(
           //     builder: (context) => DemoScreen(
@@ -37,10 +40,7 @@ class LocalNotificationService{
     try {
       final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       const NotificationDetails notificationDetails = NotificationDetails(
-        android: AndroidNotificationDetails(
-          "pushnotificationapp",
-          "pushnotificationappchannel",
-          importance: Importance.max,
+        android: AndroidNotificationDetails('donut_hub','donut_hub',importance: Importance.max,
           priority: Priority.high,
         ),
       );
@@ -50,7 +50,7 @@ class LocalNotificationService{
         message.notification!.title,
         message.notification!.body,
         notificationDetails,
-        payload: message.data['_id'],
+        payload: message.data['id'],
       );
     } on Exception catch (e) {
       print(e);

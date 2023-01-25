@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:badges/badges.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donut_hub/admin%20pages/add_item.dart';
 import 'package:donut_hub/authentication%20pages/login_page.dart';
 import 'package:donut_hub/ui_pages/profile.dart';
@@ -17,6 +18,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../admin pages/orders_screen.dart';
 import '../notification_service/local_notification_service.dart';
 import '../tab/burger_tab.dart';
 import '../tab/donut_tab.dart';
@@ -31,27 +33,43 @@ import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   static String id = "home_screen";
-  static bool showCartBadge = false;
+ /* static bool showCartBadge = false;
+  static bool showOrderBadge = false;*/
  static int counterCartBadge = 0;
   static StreamController<String> imageStreamController = StreamController<String>.broadcast();
   static StreamController<String> phoneStreamController = StreamController<String>.broadcast();
   static StreamController<String> emailStreamController = StreamController<String>.broadcast();
   static StreamController<String> nameStreamController = StreamController<String>.broadcast();
   static StreamController<int> cartBadgeStreamCn = StreamController<int>.broadcast();
-  const Home({Key? key}) : super(key: key);
+  static StreamController<int> orderBadgeStreamCn = StreamController<int>.broadcast();
+   Home({Key? key}) : super(key: key);
 
   static updateCartBadge()async{
     DatabaseReference ref=FirebaseDatabase.instance
-        .ref("Users/"+FirebaseAuth.instance.currentUser!.uid+"/Cart");
+        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart");
     final snapshot = await ref.get();
     if(snapshot.exists){
       Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
 
       if(mapList!=null){
-        showCartBadge=true;
+       // showCartBadge=true;
         cartBadgeStreamCn.sink.add(mapList.length);
       }else{
-        showCartBadge=false;
+       // showCartBadge=false;
+      }
+    }
+  }
+  static updateOrderBadge()async{
+    DatabaseReference ref=FirebaseDatabase.instance
+        .ref("Admin/Pending Orders/");
+    final snapshot = await ref.get();
+    if(snapshot.exists){
+      Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+      if(mapList!=null){
+      //  showOrderBadge=true;
+        orderBadgeStreamCn.sink.add(mapList.length);
+      }else{
+      //  showOrderBadge=false;
       }
     }
   }
@@ -79,11 +97,13 @@ class Home extends StatefulWidget {
       }
     }
   }
-  static sendNotificationToTopic(String title,String body,String token)async{
+  bool isAdmin = (FirebaseAuth.instance.currentUser!.uid ==
+      '9IHNNPnvYZYCgQMJzJswYhVo7pl2') ? true : false;
+  static sendNotificationToTopic(String title,String body,String token,int id)async{
 
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-      'id': '1',
+      'id': id,
       'status': 'done',
       'message': title,
     };
@@ -93,10 +113,10 @@ class Home extends StatefulWidget {
         'Authorization': 'key=AAAAlAoZifQ:APA91bEAR6QRAVDdWDAHd8zw-GysRWteD3LvdOT7mPvQfqqHtnopFH3Gb8mPlygO6VA-4rwwBepQFZRGbPY4XekUVP7ZSog2qPDlEJ1bhDWX22Zl_agQri8A1an5lVePFhpL2MQR-t4V'
       },
           body: jsonEncode(<String,dynamic>{
-            'notification': <String,dynamic> {'title': title,'body': body},
+            'notification': <String,dynamic> {'title': title,'body': body,'android_channel_id':'donut_hub'},
             'priority': 'high',
             'data': data,
-            'to': '$token'
+            'to': token
           })
       );
       if(response.statusCode == 200){
@@ -157,8 +177,7 @@ class _HomeState extends State<Home> {
   ];
   @override
   Widget build(BuildContext context) {
-    bool isAdmin = (FirebaseAuth.instance.currentUser!.uid ==
-            '9IHNNPnvYZYCgQMJzJswYhVo7pl2') ? true : false;
+
     return Scaffold(
       body: DefaultTabController(
         length: myTabs.length,
@@ -263,6 +282,7 @@ class _HomeState extends State<Home> {
                           }))
               ),
 
+              if(!widget.isAdmin)
               ///Cart Icon
               Padding(
                 padding: const EdgeInsets.all(8),
@@ -293,14 +313,43 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
+             if(widget.isAdmin)
+               ///Orders /Admin
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Hero(
+                    tag: 'order',
+                    child: StreamBuilder<int>(
+                        stream: Home.orderBadgeStreamCn.stream,
+                        builder: (context,snap) {
+                          return Badge(
+                            position: BadgePosition.topEnd(top: -6,end: -5),
+                            showBadge:snap.hasData,
+                            badgeContent:  Text(snap.data!=null? snap.data.toString():"",style:const TextStyle(color: Colors.white),),
+                            badgeColor: Colors.pink,
+                            child: RoundIconButton(
+                                hight: 50,
+                                widgh: 50,
+                                iconPath: 'lib/icons/parcel.png',
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => OrdersScreen()));
+                                }),
+                          );
+                        }
+                    ),
+                  ),
+                ),
             ],
           ),
-          floatingActionButton: isAdmin
+          floatingActionButton: widget.isAdmin
               ? FloatingActionButton(
                   heroTag: 'addItem',
                   onPressed: ()async {
                   Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AddItem()));
+                        MaterialPageRoute(builder: (context) => const AddItem()));
                   },
                   child: const Icon(
                     Icons.add,
@@ -318,6 +367,13 @@ class _HomeState extends State<Home> {
 
           body: Column(
             children: [
+              if(widget.isAdmin)
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 13,
+                color: Colors.pink,
+                child: Center(child: HeadingText(text: "Admin", color: Colors.white,size: 10,),),
+              ),
               ///I want to EAT
               Padding(
                 padding: const EdgeInsets.all(5),
@@ -386,6 +442,9 @@ class _HomeState extends State<Home> {
     String? token = await FirebaseMessaging.instance.getToken();
     DatabaseReference ref=FirebaseDatabase.instance
         .ref("Users/${FirebaseAuth.instance.currentUser!.uid}");
+
+    DatabaseReference adminRef=FirebaseDatabase.instance
+        .ref("Admin/adminToken");
     final snapshot = await ref.get();
     if(snapshot.exists){
       if(token!=null){
@@ -393,6 +452,14 @@ class _HomeState extends State<Home> {
         if(mapList['token']==null || mapList['token']!=token){
           ref.update({
             'token':token
+          }).onError((error, stackTrace){
+            if (kDebugMode) {
+              print(error.toString());
+            }
+          });
+          //if user is admin then update the admin tokon
+          adminRef.update({
+            'adminToken':token
           }).onError((error, stackTrace){
             if (kDebugMode) {
               print(error.toString());
@@ -406,6 +473,12 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
      Home. getUserData();
+     /*if(widget.isAdmin){
+       Timer.periodic(Duration(seconds: 3), (timer) {
+         Home.updateOrderBadge();
+       });
+     }*/
+     Home.updateOrderBadge();
      storeNotificationToken();
     ///Lock orientations on Mobile Devices
     if (defaultTargetPlatform == TargetPlatform.iOS ||
@@ -418,13 +491,11 @@ class _HomeState extends State<Home> {
      // when you click on notification app open from terminated state and you can get notification data in this method
      FirebaseMessaging.instance.getInitialMessage().then(
            (message) {
-         print("FirebaseMessaging.instance.getInitialMessage");
          if (message != null) {
-           print("New Notification");
-           if (message.data['_id'] != null) {
+           if (message.data['id'] ==10) {
              Navigator.of(context).push(
                MaterialPageRoute(
-                 builder: (context) =>const Cart(),
+                 builder: (context) =>const OrdersScreen(),
                ),
              );
            }
@@ -437,11 +508,13 @@ class _HomeState extends State<Home> {
      // 2. This method only call when App in forground it mean app must be opened
      FirebaseMessaging.onMessage.listen(
            (message) {
-         print("FirebaseMessaging.onMessage.listen");
          if (message.notification != null) {
-           print(message.notification!.title);
-           print(message.notification!.body);
-           print("message.data11 ${message.data}");
+           Home.updateOrderBadge();
+           if (kDebugMode) {
+             print(message.notification!.title);
+             print(message.notification!.body);
+             print("message.data11 ${message.data}");
+           }
            LocalNotificationService.createanddisplaynotification(message);
          }
        },
@@ -450,11 +523,16 @@ class _HomeState extends State<Home> {
      // 3. This method only call when App in background and not terminated(not closed)
      FirebaseMessaging.onMessageOpenedApp.listen(
            (message) {
-         print("FirebaseMessaging.onMessageOpenedApp.listen");
+         if (kDebugMode) {
+           print("FirebaseMessaging.onMessageOpenedApp.listen");
+         }
          if (message.notification != null) {
-           print(message.notification!.title);
-           print(message.notification!.body);
-           print("message.data22 ${message.data['_id']}");
+           Home.updateOrderBadge();
+           if (kDebugMode) {
+             print(message.notification!.title);
+             print(message.notification!.body);
+             print("message.data22 ${message.data['_id']}");
+           }
          }
        },
      );
