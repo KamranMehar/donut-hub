@@ -115,7 +115,7 @@ class _VerifyCodeState extends State<VerifyCode>{
                         verificationId: widget.verificationId, smsCode: codeController.text);
                     try{
                     await auth.signInWithCredential(credential).then((value) async {
-                      DatabaseReference databaseReference= FirebaseDatabase.instance.ref("Users/${auth.currentUser!.uid}/phoneNumber/");
+                      DatabaseReference databaseReference= FirebaseDatabase.instance.ref("Users/${auth.currentUser!.uid}/details/phoneNumber/");
                       databaseReference.set(widget.phoneNumber,).then((value) {
                         Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
                       }).onError((error, stackTrace) {

@@ -223,7 +223,7 @@ class _EditProfileState extends State<EditProfile> {
                       click: () async {
                         FocusManager.instance.primaryFocus?.unfocus();
                         DatabaseReference ref =
-                        FirebaseDatabase.instance.ref("Users/$userId");
+                        FirebaseDatabase.instance.ref("Users/$userId/details");
                         setState(() {
                           if (email != null) {
                             email = emailController.text;
@@ -237,7 +237,7 @@ class _EditProfileState extends State<EditProfile> {
 
                         ///Set Data without image
                         if (titleImage == null) {
-                          ref.set({
+                          ref.update({
                             if (email != null) 'email': email,
                             'name': name,
                             if (phoneNumber != null) 'phoneNumber': phoneNumber,
@@ -263,7 +263,7 @@ class _EditProfileState extends State<EditProfile> {
                           storageRef.putFile(titleImage!.absolute);
                           await Future.value(imageUploadTask).then((value) async {
                             var imageUrl = await storageRef.getDownloadURL();
-                            ref.set({
+                            ref.update({
                               if (email != null) 'email': email,
                               'name': name,
                               if (phoneNumber != null) 'phoneNumber': phoneNumber,
@@ -298,7 +298,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   getData() async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref("Users/$userId");
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Users/$userId/details/");
     final snapshot = await ref.get();
 
     if (snapshot.exists) {

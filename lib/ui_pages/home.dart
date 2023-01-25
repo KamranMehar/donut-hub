@@ -76,7 +76,7 @@ class Home extends StatefulWidget {
   static getUserData() async {
     if (FirebaseAuth.instance.currentUser != null) {
       var userId = FirebaseAuth.instance.currentUser!.uid;
-      var ref = FirebaseDatabase.instance.ref("Users/$userId");
+      var ref = FirebaseDatabase.instance.ref("Users/$userId/details");
       final snapshot = await ref.get();
       if (snapshot.exists) {
         if (snapshot.value != null) {
@@ -138,8 +138,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  DatabaseReference userDataRef = FirebaseDatabase.instance
-      .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/");
+ // DatabaseReference userDataRef = FirebaseDatabase.instance
+  //    .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/");
 
   /// my tabs
   List<Widget> myTabs = [
@@ -441,33 +441,34 @@ class _HomeState extends State<Home> {
   storeNotificationToken()async{
     String? token = await FirebaseMessaging.instance.getToken();
     DatabaseReference ref=FirebaseDatabase.instance
-        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}");
+        .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/details/");
 
     DatabaseReference adminRef=FirebaseDatabase.instance
         .ref("Admin/adminToken");
     final snapshot = await ref.get();
-    if(snapshot.exists){
-      if(token!=null){
-      Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
-        if(mapList['token']==null || mapList['token']!=token){
+
+      if(token!=null) {
+        Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
+        if (mapList['token'] == null || mapList['token'] != token) {
           ref.update({
-            'token':token
-          }).onError((error, stackTrace){
+            'token': token
+          }).onError((error, stackTrace) {
             if (kDebugMode) {
               print(error.toString());
             }
           });
+        }
+        if (widget.isAdmin) {
           //if user is admin then update the admin tokon
           adminRef.update({
-            'adminToken':token
-          }).onError((error, stackTrace){
+            'adminToken': token
+          }).onError((error, stackTrace) {
             if (kDebugMode) {
               print(error.toString());
             }
           });
         }
       }
-    }
   }
 
   @override

@@ -204,7 +204,7 @@ class _Sign_upState extends State<Sign_up> {
       setState(() {
       loading=false;
       }),
-        databaseRef.child(auth.currentUser!.uid.toString()).set({
+        databaseRef.child(auth.currentUser!.uid.toString()).child('details').set({
           "name": name,
           "email": email
         }).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context)=>Home())))
