@@ -117,7 +117,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 //get user Name
   Future<String> getUserName()async{
   DatabaseReference ref=FirebaseDatabase.instance
-      .ref("Users/${FirebaseAuth.instance.currentUser!.uid}");
+      .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/details");
   final snapshot = await ref.get();
   if(snapshot.exists){
     Map<dynamic, dynamic> mapList = snapshot.value as dynamic;
@@ -620,7 +620,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
    getAdminToken()async{
     String result;
-   await FirebaseDatabase.instance.ref("Admin/adminToken").once().then((value){
+   await FirebaseDatabase.instance.ref("Admin/adminToken/adminToken").once().then((value){
      result=value.snapshot.value.toString();
      adminDeviceToken=result;
    });
