@@ -5,6 +5,7 @@ import 'package:donut_hub/util/Util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../ui_pages/item_detail.dart';
 import '../util/check_internet_connection_widget.dart';
 import '../util/constents.dart';
@@ -46,6 +47,7 @@ bool refreshPage = false;
         if(!snapshot.hasData){
           ///Loading tile
           return  GridView.builder(
+            padding: const EdgeInsets.only(bottom: 30),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   childAspectRatio: 1/1.6,
                   maxCrossAxisExtent: 200
@@ -94,22 +96,29 @@ bool refreshPage = false;
                         imageName: list[index]['titleImage'],
                         ///Add To Card on Tap method
                         addToCart: () async {
-                          var orderName=list[index]['name'];
-                          DatabaseReference reference=FirebaseDatabase.instance
-                              .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderName");
-                          reference.set({
-                            'name':list[index]['name'],
-                            'price':list[index]['price'],
-                            'titleImage':list[index]['titleImage'],
-                            'coverImage':list[index]['coverImage'],
-                            'itemType':"Donut",
-                            'quantity':1,
-                          }).then((value) {
-                            Home.updateCartBadge();
-                            Util_.showToast(list[index]['name']+" Added To Cart");
-                          }).onError((error, stackTrace) {
-                            Util_.showToast(error.toString());
-                          });
+                          if(await checkPendingOrder()){
+                            Util_.showToast("Wait for your pending Order to add item to Cart !");
+                          }else {
+                            var orderName = list[index]['name'];
+                            DatabaseReference reference = FirebaseDatabase
+                                .instance
+                                .ref("Users/${FirebaseAuth.instance.currentUser!
+                                .uid}/Cart/$orderName");
+                            reference.set({
+                              'name': list[index]['name'],
+                              'price': list[index]['price'],
+                              'titleImage': list[index]['titleImage'],
+                              'coverImage': list[index]['coverImage'],
+                              'itemType': "Donut",
+                              'quantity': 1,
+                            }).then((value) {
+                              Home.updateCartBadge();
+                              Util_.showToast(
+                                  list[index]['name'] + " Added To Cart");
+                            }).onError((error, stackTrace) {
+                              Util_.showToast(error.toString());
+                            });
+                          }
                         }, addToFav: () {  },)
                 );
               },
@@ -134,6 +143,15 @@ bool refreshPage = false;
                   );
                 });
   }
+Future<bool> checkPendingOrder()async{
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  bool? isOrderPending=  pref.getBool("pendingOrder");
+  if(isOrderPending==false || isOrderPending==null){
+    return false;
+  }else{
+    return true;
+  }
+}
   @override
   void initState() {
     // TODO: implement initState

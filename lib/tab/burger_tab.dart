@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../ui_pages/home.dart';
 import '../ui_pages/item_detail.dart';
 import '../util/Util.dart';
@@ -63,8 +64,8 @@ class _BurgerTabState extends State<BurgerTab> {
                   if(map!=null) {
                     list = map.values.toList();
                     return  GridView.builder(
+                      padding: const EdgeInsets.only(bottom: 30),
                       itemCount: list.length,
-                      padding: const EdgeInsets.all(12),
                       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                           childAspectRatio: 1 / 1.6,
                           maxCrossAxisExtent: 200
@@ -95,6 +96,9 @@ class _BurgerTabState extends State<BurgerTab> {
                               imageName: list[index]['titleImage'],
                               ///Add To Card on Tap method
                               addToCart: () async {
+                                if(await checkPendingOrder()){
+                                  Util_.showToast("Wait for your pending Order to add item to Cart !");
+                                }else{
                                 var orderName=list[index]['name'];
                                 DatabaseReference reference=FirebaseDatabase.instance
                                     .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/Cart/$orderName");
@@ -111,6 +115,7 @@ class _BurgerTabState extends State<BurgerTab> {
                                 }).onError((error, stackTrace) {
                                   Util_.showToast(error.toString());
                                 });
+                                }
                               }, addToFav: () {  },)
                         );
                       },
@@ -135,5 +140,14 @@ class _BurgerTabState extends State<BurgerTab> {
           );
         });
 
+  }
+  Future<bool> checkPendingOrder()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    bool? isOrderPending=  pref.getBool("pendingOrder");
+    if(isOrderPending==false || isOrderPending==null){
+      return false;
+    }else{
+      return true;
+    }
   }
 }
